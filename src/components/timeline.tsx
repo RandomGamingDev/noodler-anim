@@ -9,9 +9,9 @@ export default function Timeline() {
         </div>
         <div className="flex pl-3">
           <p>Frame</p>
-          <input type="number" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
+          <input type="number" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
           <p>FPS</p>
-          <input type="number" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
+          <input type="number" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
         </div>
       </div>
       <p>Hello, World!</p>
