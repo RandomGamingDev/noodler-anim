@@ -1,7 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export'
+  output: 'export',
+  variants: {
+    extend: {
+        display: ["group-hover"],
+    },
+  },
+
 };
 
 export default nextConfig;
