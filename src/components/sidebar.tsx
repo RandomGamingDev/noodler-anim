@@ -25,9 +25,12 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
   const export_mode = () => {
     setMode(DrawMode.Export);
   };
+  const information_mode = () => {
+    setMode(DrawMode.Information);
+  };
 
   return (
-    <div className="w-fit min-h-screen bg-gray-800 p-2 fixed left-0 border border-gray-700">
+    <div className="w-fit max-h-screen bg-gray-800 p-2 border border-gray-700">
       <div className="flex group">
         <svg id="clear" onClick={clear_mode} viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg" strokeWidth={2.0} stroke="currentColor" className="my-4 size-6 cursor-pointer"><rect x="2" y="2" width="12" height="12" rx="1"/></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">
@@ -72,7 +75,7 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
       </div>
 
       <div className="flex group fixed bottom-0">
-        <svg id="information" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.7} stroke="currentColor" className="my-4 size-6 cursor-pointer"><path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
+        <svg id="information" onClick={information_mode} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.7} stroke="currentColor" className="my-4 size-6 cursor-pointer"><path strokeLinecap="round" strokeLinejoin="round" d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z" /></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 stroke-white border border-gray-700">
           <p className="p-3">{DrawModeName(DrawMode.Information)}</p>
         </div>

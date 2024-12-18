@@ -12,6 +12,7 @@
     "next": "15.1.0",
     "p5": "^1.11.2",
     "react": "^19.0.0",
+    "react-color-palette": "^7.3.0",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
