@@ -53,15 +53,11 @@ export class Layer {
 
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Information);
-  const [layers, setLayers] = useState<Array<Layer>>([]);
-
-  ///* Test
-  setLayers([
+  const [layers, setLayers] = useState<Array<Layer>>([
     new Layer(true, "test1", []),
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
   ]);
-  //*/
 
   return (
     <div className="flex">
