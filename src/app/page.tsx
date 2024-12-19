@@ -4,6 +4,7 @@ import Canvas from "@/components/canvas";
 import Details from "@/components/details";
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
+import p5 from "p5";
 import { useState } from "react";
 
 export enum DrawMode {
@@ -38,8 +39,29 @@ export function DrawModeName(draw_mode: DrawMode) {
   }
 }
 
+export class Layer {
+  visible: boolean
+  name: string
+  frames: Array<p5.Image>
+
+  constructor(visible: boolean, name: string, frames: Array<p5.Image>) {
+    this.visible = visible;
+    this.name = name;
+    this.frames = frames;
+  }
+}
+
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Information);
+  const [layers, setLayers] = useState<Array<Layer>>([]);
+
+  ///* Test
+  setLayers([
+    new Layer(true, "test1", []),
+    new Layer(false, "test2", []),
+    new Layer(true, "bollocks", [])
+  ]);
+  //*/
 
   return (
     <div className="flex">

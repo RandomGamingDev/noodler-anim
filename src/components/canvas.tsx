@@ -15,12 +15,15 @@ export default function Canvas() {
       sketch.setup = () => {
         canvas = sketch.createCanvas(200, 200);
         canvas.parent(canvas_container.current!);
+        ///*
+        canvas.style("width", "960");
+        canvas.style("height", "540");
+        //*/
       };
     
       sketch.draw = () => {
         const canvas_container_loc = [canvas_container.current!.offsetLeft, canvas_container.current!.offsetTop];
         const canvas_container_dims = [canvas_container.current!.offsetWidth, canvas_container.current!.offsetHeight];
-        console.log(canvas_container_dims);
         
         canvas.position(
           canvas_container_loc[0] + canvas_container_dims[0] / 2 - canvas.width / 2,
@@ -28,8 +31,7 @@ export default function Canvas() {
         );
 
         sketch.background(0);
-        sketch.fill(255);
-        sketch.rect(x,y,50,50);
+        sketch.rect(0, 0, 100, 100);
       };
     };
     let myp5 = new p5(s);
