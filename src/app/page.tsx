@@ -63,8 +63,8 @@ export default function Home() {
     <div className="flex">
       <Sidebar setMode={setMode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas></Canvas>
-        <Timeline></Timeline>
+        <Canvas mode={mode}></Canvas>
+        <Timeline layers={layers}></Timeline>
       </div>
       <Details mode={mode}></Details>
     </div>
