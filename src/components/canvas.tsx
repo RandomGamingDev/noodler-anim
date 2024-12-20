@@ -16,6 +16,9 @@ export default function Canvas({ mode } : { mode: DrawMode }) {
       sketch.setup = () => {
         canvas = sketch.createCanvas(200, 200, sketch.WEBGL);
         canvas.parent(canvas_container.current!);
+        canvas.style('width', '1000px');
+        canvas.style('height', '50px');
+        canvas.style('image-rendering', 'pixelated'); // crisp-edges
         // Make it so that size can be independent of resolution
       };
     
