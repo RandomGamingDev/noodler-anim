@@ -19,10 +19,13 @@ export default function Canvas({ mode } : { mode: DrawMode }) {
         canvas.style('width', '1000px');
         canvas.style('height', '50px');
         canvas.style('image-rendering', 'pixelated'); // crisp-edges
+        canvas.style('overflow', 'hidden'); // crisp-edges
         // Make it so that size can be independent of resolution
       };
     
       const canvas_pos_handler = () => {
+
+
         // Set canvas position
         const canvas_container_loc = [canvas_container.current!.offsetLeft, canvas_container.current!.offsetTop];
         const canvas_container_dims = [canvas_container.current!.offsetWidth, canvas_container.current!.offsetHeight];
