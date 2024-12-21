@@ -1,6 +1,7 @@
 import { Layer } from "@/app/page";
+import { Dispatch } from "react";
 
-export default function Timeline({ layers } : { layers: Array<Layer> }) {
+export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps } : { layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number> }) {
   return (
     <div className="w-full h-[20%] bg-gray-800 z-[-1] border border-gray-700">
       <div className="flex border border-gray-700">

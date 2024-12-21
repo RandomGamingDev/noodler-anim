@@ -58,13 +58,16 @@ export default function Home() {
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
   ]);
+  const [layerCursor, setLayerCursor] = useState(0);
+  const [frame, setFrame] = useState(0);
+  const [fps, setFps] = useState(60);
 
   return (
     <div className="flex">
       <Sidebar setMode={setMode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas mode={mode}></Canvas>
-        <Timeline layers={layers}></Timeline>
+        <Canvas mode={mode} layers={layers} layerCursor={layerCursor} frame={frame}></Canvas>
+        <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps}></Timeline>
       </div>
       <Details mode={mode}></Details>
     </div>
