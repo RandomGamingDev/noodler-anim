@@ -5,7 +5,9 @@ import { RefObject } from "react";
 export default function Details({ mode, layers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
-    //current_frame.
+    current_frame.begin();
+    p5sketch.current!.clear();
+    current_frame.end();
   }
 
   const clear_details = (
@@ -13,10 +15,6 @@ export default function Details({ mode, layers, layerCursor, frame, p5sketch } :
       <table>
         <thead></thead>
         <tbody>
-          <tr>
-            <th><h2 className="font-normal p-2">Background Color</h2></th>
-            <th><input className="m-1" type="color" /></th>
-          </tr>
         </tbody>
       </table>
       <button onClick={clear} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>

@@ -9,6 +9,8 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
     clicked.setAttribute("stroke", "#ADD8E6");
     clicked.setAttribute("fill", "#ADD8E6");
     setMode(prev_mode => {
+      if (mode == prev_mode)
+        return prev_mode;
       const unselected = document.getElementById(DrawModeName(prev_mode).toLowerCase());
       unselected!.setAttribute("stroke", "currentColor");
       unselected!.setAttribute("fill", "currentColor");
@@ -74,13 +76,13 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
         </div>
       </div>
       <div className="flex group">
-        <svg id="download" onClick={download_mode} viewBox="0 0 22 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M4.78316 2.14697H8.31316V6.43689H13.6911V2.14697H17.2168V6.43689V15.5786H13.6911H8.31316H4.78316V6.43689V2.14697Z" /></svg>
+        <svg id="download" onClick={download_mode} viewBox="0 0 22 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M4.78316 2.14697H8.31316V6.43689H13.6911V2.14697H17.2168V6.43689V15.5786H13.6911H8.31316H4.78316V6.43689V2.14697Z" /></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">
           <p className="p-3">{DrawModeName(DrawMode.Download)}</p>
         </div>
       </div>
       <div className="flex group">
-        <svg id="export" onClick={export_mode} viewBox="0 0 14 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.29923 0.536743H5.70077V2.84082H8.29923V0.536743ZM5.70077 4.44397H8.29923V8.42188H13.9111V18.4585H0.0888596V8.42188H5.70077V4.44397Z" /></svg>
+        <svg id="export" onClick={export_mode} viewBox="0 0 14 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M8.29923 0.536743H5.70077V2.84082H8.29923V0.536743ZM5.70077 4.44397H8.29923V8.42188H13.9111V18.4585H0.0888596V8.42188H5.70077V4.44397Z" /></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">
           <p className="p-3">{DrawModeName(DrawMode.Export)}</p>
         </div>

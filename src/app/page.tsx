@@ -5,7 +5,7 @@ import Details from "@/components/details";
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
 import p5 from "p5";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export enum DrawMode {
   Clear,
@@ -42,9 +42,9 @@ export function DrawModeName(draw_mode: DrawMode) {
 export class Layer {
   visible: boolean
   name: string
-  frames: Array<p5.Image>
+  frames: Array<p5.Framebuffer>
 
-  constructor(visible: boolean, name: string, frames: Array<p5.Image>) {
+  constructor(visible: boolean, name: string, frames: Array<p5.Framebuffer>) {
     this.visible = visible;
     this.name = name;
     this.frames = frames;
@@ -58,16 +58,16 @@ export default function Home() {
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
   ]);
-  const [layerCursor, setLayerCursor] = useState(0);
-  const [frame, setFrame] = useState(0);
-  const [fps, setFps] = useState(60);
+  const [layerCursor, setLayerCursor] = useState<number>(0);
+  const [frame, setFrame] = useState<number>(0);
+  const [fps, setFps] = useState<number>(60);
   const p5sketch = useRef<p5>(null);
 
   return (
     <div className="flex">
       <Sidebar setMode={setMode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Canvas>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps}></Timeline>
       </div>
       <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Details>
