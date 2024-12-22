@@ -27,6 +27,9 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
   const brush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     set_mode(DrawMode.Brush, e);
   };
+  const pixelbrush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    set_mode(DrawMode.PixelBrush, e);
+  };
   const fill_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     set_mode(DrawMode.Fill, e);
   };
@@ -63,6 +66,13 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
           <p className="p-3">{DrawModeName(DrawMode.Brush)}</p>
         </div>
       </div>
+      <div className="flex group">
+        <svg id="pixelbrush" onClick={pixelbrush_mode} viewBox="0 0 18 19" fill="currentColor" xmlns="http://www.w3.org/2000/svg" strokeWidth={0} stroke="currentColor" className="my-4 size-6 cursor-pointer"><rect x="6.28595" y="6.87439" width="5.39609" height="5.39609"/><rect x="4.03934" y="10.0393" width="5.39609" height="5.39609" transform="rotate(45 4.03934 10.0393)"/><circle cx="13.9172" cy="4.68146" r="3.11872"/></svg>
+        <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">
+          <p className="p-3">{DrawModeName(DrawMode.Brush)}</p>
+        </div>
+      </div>
+
       <div className="flex group">
         <svg id="fill" onClick={fill_mode} viewBox="0 0 24 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" strokeWidth={0} stroke="currentColor" className="my-4 size-6 cursor-pointer"><rect x="11.8984" y="2.64685" width="9.78835" height="12.7943" transform="rotate(45 11.8984 2.64685)" /><rect x="19.4903" y="10.097" width="2.34517" height="2.34517" transform="rotate(45 19.4903 10.097)" /><rect x="19.4903" y="13.4137" width="2.34517" height="2.34517" transform="rotate(45 19.4903 13.4137)"/></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">

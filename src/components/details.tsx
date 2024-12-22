@@ -45,6 +45,20 @@ export default function Details({ mode, layers, layerCursor, frame, p5sketch } :
     </div>
   );
 
+  const pixelbrush_details = (
+    <div className="text-left">
+      <table>
+        <thead></thead>
+        <tbody>
+          <tr>
+            <th><h2 className="font-normal p-2">Brush Size</h2></th>
+            <th><input className="m-1 max-w-16 text-black" type="number" /></th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  );
+
   const fill_details = (
     <div className="text-left">
       <table>
@@ -139,6 +153,7 @@ export default function Details({ mode, layers, layerCursor, frame, p5sketch } :
           clear_details,
           select_details,
           brush_details,
+          pixelbrush_details,
           fill_details,
           eraser_details,
           download_details,

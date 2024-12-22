@@ -11,6 +11,7 @@ export enum DrawMode {
   Clear,
   Select,
   Brush,
+  PixelBrush,
   Fill,
   Eraser,
   Download,
@@ -26,6 +27,8 @@ export function DrawModeName(draw_mode: DrawMode) {
       return "Select";
     case DrawMode.Brush:
       return "Brush";
+    case DrawMode.PixelBrush:
+      return "PixelBrush";
     case DrawMode.Fill:
       return "Fill";
     case DrawMode.Eraser:

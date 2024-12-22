@@ -118,14 +118,14 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
 
       let mouse_pressed_loc = [0, 0];
       sketch.mousePressed = (event: MouseEvent) => {
-        mouse_pressed_loc[0] = event.x;
-        mouse_pressed_loc[1] = event.y;
+        mouse_pressed_loc[0] = sketch.mouseX;
+        mouse_pressed_loc[1] = sketch.mouseY;
       }
 
       let mouse_released_loc = [0, 0];
       sketch.mouseReleased = (event: MouseEvent) => {
-        mouse_released_loc[0] = event.x;
-        mouse_released_loc[1] = event.y;
+        mouse_released_loc[0] = sketch.mouseX;
+        mouse_released_loc[1] = sketch.mouseY;
       }
 
       sketch.draw = () => {
@@ -133,7 +133,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
 
         // Get current frame
         const current_frame = layersRef.current[layerCursorRef.current].frames[frameRef.current];
-        console.log(write_buf == current_frame);
         write_buf = current_frame;
 
         // Foreground aka UI rendering
@@ -150,6 +149,38 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
 
         // Handle different tools
         switch (modeRef.current) {
+          case DrawMode.Select:
+            if (sketch.mouseIsPressed) {
+              sketch.push();
+              {
+                sketch.noFill();
+                sketch.stroke(200);
+                sketch.strokeWeight(3);
+                const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
+                sketch.rect(
+                  mouse_pressed_loc[0],
+                  mouse_pressed_loc[1],
+                  sketch.mouseX - selection_org[0],
+                  sketch.mouseY - selection_org[1]
+                );
+              }
+              sketch.pop();
+            }
+            else if (mouse_was_pressed) {
+              const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
+              const copied: HTMLCanvasElement = (sketch.get(
+                mouse_pressed_loc[0],
+                mouse_pressed_loc[1],
+                sketch.mouseX - selection_org[0],
+                sketch.mouseY - selection_org[1]
+              ) as unknown as { canvas: HTMLCanvasElement }).canvas;
+
+              copied.toBlob(function(blob) { 
+                const item = new ClipboardItem({ "image/png": blob! });
+                navigator.clipboard.write([item]); 
+              });
+            }
+            break;
           case DrawMode.Brush:
             sketch.push();
             {
