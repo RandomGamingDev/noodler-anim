@@ -1,6 +1,13 @@
-import { DrawMode, DrawModeName } from "@/app/page";
+import { DrawMode, DrawModeName, Layer } from "@/app/page";
+import p5 from "p5";
+import { RefObject } from "react";
 
-export default function Details({ mode } : { mode: DrawMode }) {
+export default function Details({ mode, layers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
+  const clear = () => {
+    const current_frame = layers[layerCursor].frames[frame];
+    //current_frame.
+  }
+
   const clear_details = (
     <div className="text-left">
       <table>
@@ -12,7 +19,7 @@ export default function Details({ mode } : { mode: DrawMode }) {
           </tr>
         </tbody>
       </table>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>
+      <button onClick={clear} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>
     </div>
   );
 

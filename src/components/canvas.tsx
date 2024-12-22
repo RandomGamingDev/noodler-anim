@@ -1,10 +1,11 @@
 'use client'
 
-import { RefObject, useEffect, useRef } from "react";
+import { Reference, RefObject, useEffect, useRef } from "react";
 import p5 from "p5";
 import { DrawMode, Layer } from "@/app/page";
+import dynamic from "next/dynamic";
 
-export default function Canvas({ mode, layers, layerCursor, frame } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number }) {
+export default function Canvas({ mode, layers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -18,7 +19,7 @@ export default function Canvas({ mode, layers, layerCursor, frame } : { mode: Dr
     frameRef.current = frame;
   });
 
-  const p5sketch = useRef<p5>(null);
+  
   useEffect(() => {
     const s = (sketch: p5) => {
       let canvas: p5.Renderer;
@@ -26,7 +27,8 @@ export default function Canvas({ mode, layers, layerCursor, frame } : { mode: Dr
       let mouse_was_pressed = false;
       let was_pressed_keys: { [id: string]: boolean } = {};
       const pressed_keys: { [id: string]: boolean } = {};
-    
+      let write_buf: p5.Framebuffer;
+
       const get_canvas_dims = () => [Number(canvas.elt.style.width.slice(0, -2)), Number(canvas.elt.style.height.slice(0, -2))];
 
       sketch.setup = () => {
@@ -36,6 +38,9 @@ export default function Canvas({ mode, layers, layerCursor, frame } : { mode: Dr
         canvas = sketch.createCanvas(200, 200, sketch.WEBGL);
         canvas.parent(canvas_container.current!);
         canvas.style('image-rendering', 'pixelated');
+
+        // Initialize frame buffer
+        write_buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
 
         { // Set canvas position
           const canvas_container_loc = [canvas_container.current!.offsetLeft, canvas_container.current!.offsetTop];
@@ -86,13 +91,16 @@ export default function Canvas({ mode, layers, layerCursor, frame } : { mode: Dr
       sketch.draw = () => {
         cursor_handler();
 
-        // Rendering
-        sketch.background(0);
-        sketch.translate(-sketch.width / 2, -sketch.height / 2);
-        sketch.rect(0, 0, 100, 100);
-
         // Get current frame
         const current_frame = layersRef.current[layerCursorRef.current].frames[frameRef.current];
+
+        // Foreground aka UI rendering
+        sketch.background(0);
+        sketch.translate(-sketch.width / 2, -sketch.height / 2);
+
+        { // Frame
+          sketch.image(write_buf, 0, 0, sketch.width, sketch.height);
+        }
 
         // Handle different tools
         switch (modeRef.current) {
@@ -107,9 +115,41 @@ export default function Canvas({ mode, layers, layerCursor, frame } : { mode: Dr
 
               // Draw
               if (mouse_was_pressed && sketch.mouseIsPressed) {
-                sketch.stroke("red"); // Placeholder
-                sketch.strokeWeight(100);
-                sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+                write_buf.begin();
+                sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                {
+                  sketch.stroke("red"); // Placeholder
+                  sketch.strokeWeight(25);
+                  sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+                }
+                write_buf.end();
+              }
+            }
+            sketch.pop();
+            break;
+          case DrawMode.Fill:
+            
+            break;
+          case DrawMode.Eraser:
+            sketch.push();
+            {
+              // Draw cursor
+              sketch.stroke(200);
+              sketch.strokeWeight(1);
+              sketch.noFill();
+              sketch.circle(sketch.mouseX, sketch.mouseY, 25);
+
+              // Draw
+              if (mouse_was_pressed && sketch.mouseIsPressed) {
+                write_buf.begin();
+                sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                {
+                  sketch.erase(); // Placeholder
+                  sketch.strokeWeight(25);
+                  sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+                  sketch.noErase();
+                }
+                write_buf.end();
               }
             }
             sketch.pop();
