@@ -10,10 +10,9 @@ export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction
     clicked.setAttribute("fill", "#ADD8E6");
     setMode(prev_mode => {
       const unselected = document.getElementById(DrawModeName(prev_mode).toLowerCase());
-      console.log(unselected);
       unselected!.setAttribute("stroke", "currentColor");
       unselected!.setAttribute("fill", "currentColor");
-      return DrawMode.Clear;
+      return mode;
     });
   }
 
