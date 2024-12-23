@@ -56,10 +56,27 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
                 }
                 <h2 className="cursor-pointer align-middle mt-[1.5px] text-gray-400">{e.name}</h2>
               </div>
-
               <div className="flex pl-3 my-2 align-middle">
-                <svg strokeWidth={0.1} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="3" fill="#D9D9D9"/></svg>
-                <svg strokeWidth={0.5} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2.5" stroke="white" strokeOpacity="0.6"/></svg>
+                {
+                  e.frames.map((fe, fi) => {
+                    const frame_id = `layer-${i}-frame-${fi}`;
+                    const frame_select = (e: React.MouseEvent) => {
+                      const elem = e.currentTarget;
+                      const id = elem.id;
+                      const attribs = id.split('-');
+                      const new_layer = Number(attribs[1]);
+                      const new_frame = Number(attribs[3]);
+
+                      setLayerCursor(new_layer);
+                      setFrame(new_frame);
+                    }
+                    return (
+                      layerCursor == i && frame == fi ?
+                        <svg id={frame_id} key={frame_id} onClick={frame_select} strokeWidth={0.1} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="3" fill="#D9D9D9"/></svg> :
+                        <svg id={frame_id} key={frame_id} onClick={frame_select} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2.5" stroke="white" strokeOpacity="0.6"/></svg>
+                    );
+                  })
+                }
               </div>
 
             </div>

@@ -63,6 +63,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             const buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
             layer.frames.push(buf);
           }
+        setLayers([...layersRef.current!]);
 
         { // Set canvas position
           const canvas_container_loc = [canvas_container.current!.offsetLeft, canvas_container.current!.offsetTop];
