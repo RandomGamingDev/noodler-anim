@@ -96,9 +96,24 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     </div>
   );
 
+  const download_save = (e: React.MouseEvent) => {
+    
+
+    /*
+    for (let i = 0; i < num_frames; i++) {
+      p5sketch.current!.clear();
+      for (const layer of layers) {
+        if (layer.visible)
+          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
+      }
+      CanvasCapture.recordFrame();
+    }
+    */
+  }
+
   const download_details = (
     <div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={download_save}>Download</button>
     </div>
   );
 
@@ -143,7 +158,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
 
   const export_details = (
     <div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_vid}>Clear</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_vid}>Export</button>
     </div>
   );
 

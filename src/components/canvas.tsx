@@ -128,6 +128,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         mouse_released_loc[1] = sketch.mouseY;
       }
 
+      let local_clipboard: p5.Image;
       sketch.draw = () => {
         cursor_handler();
 
@@ -168,12 +169,15 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             }
             else if (mouse_was_pressed) {
               const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
-              const copied: HTMLCanvasElement = (sketch.get(
+              const copied_img = sketch.get(
                 mouse_pressed_loc[0],
                 mouse_pressed_loc[1],
                 sketch.mouseX - selection_org[0],
                 sketch.mouseY - selection_org[1]
-              ) as unknown as { canvas: HTMLCanvasElement }).canvas;
+              );
+              const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
+
+              local_clipboard = copied_img;
 
               copied.toBlob(function(blob) { 
                 const item = new ClipboardItem({ "image/png": blob! });
@@ -204,9 +208,27 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             }
             sketch.pop();
             break;
+          case DrawMode.PixelBrush:
+            sketch.push();
+            {
+              // Draw cursor
+              sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2);
+
+              // Draw
+              if (mouse_was_pressed && sketch.mouseIsPressed) {
+                write_buf.begin();
+                sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                {
+                  sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2);
+                }
+                write_buf.end();
+              }
+            }
+            sketch.pop();
+            break;
           case DrawMode.Fill:
             if (sketch.mouseIsPressed) {
-              write_buf.begin();
+              write_buf.begin(); // Fix this and then the rest os just timeline pixel tool and hooking up settings
               {
                 if (sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width)
                   floodFill(sketch, write_buf, sketch.createVector(sketch.mouseX, sketch.mouseY), [255, 0, 0, 255]);
