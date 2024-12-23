@@ -3,47 +3,33 @@
 import { DrawMode, DrawModeName } from "@/app/page";
 import { Dispatch, SetStateAction } from "react";
 
-export default function Sidebar({ setMode } : { setMode: Dispatch<SetStateAction<DrawMode>> }) {
-  const set_mode = (mode: DrawMode, e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    const clicked = e.currentTarget;
-    clicked.setAttribute("stroke", "#ADD8E6");
-    clicked.setAttribute("fill", "#ADD8E6");
-    setMode(prev_mode => {
-      if (mode == prev_mode)
-        return prev_mode;
-      const unselected = document.getElementById(DrawModeName(prev_mode).toLowerCase());
-      unselected!.setAttribute("stroke", "currentColor");
-      unselected!.setAttribute("fill", "currentColor");
-      return mode;
-    });
-  }
-
+export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode, e: React.MouseEvent<SVGSVGElement, MouseEvent>) => void }) {
   const clear_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Clear, e);
+    set_mode(DrawMode.Clear);
   };
   const select_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Select, e);
+    set_mode(DrawMode.Select);
   };
   const brush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Brush, e);
+    set_mode(DrawMode.Brush);
   };
   const pixelbrush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
     set_mode(DrawMode.PixelBrush, e);
   };
   const fill_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Fill, e);
+    set_mode(DrawMode.Fill);
   };
   const eraser_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Eraser, e);
+    set_mode(DrawMode.Eraser);
   };
   const download_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Download, e);
+    set_mode(DrawMode.Download);
   };
   const export_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Export, e);
+    set_mode(DrawMode.Export);
   };
   const information_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.Information, e);
+    set_mode(DrawMode.Information);
   };
 
   return (

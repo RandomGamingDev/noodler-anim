@@ -1,11 +1,11 @@
 'use client'
 
-import { Reference, RefObject, useEffect, useRef } from "react";
+import { Dispatch, Reference, RefObject, useEffect, useRef } from "react";
 import p5 from "p5";
-import { DrawMode, Layer } from "@/app/page";
+import { DrawMode, DrawModeName, Layer } from "@/app/page";
 import FloodFill from 'q-floodfill';
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -130,6 +130,21 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       sketch.mouseReleased = (event: MouseEvent) => {
         mouse_released_loc[0] = sketch.mouseX;
         mouse_released_loc[1] = sketch.mouseY;
+      }
+
+      sketch.keyPressed = (event: KeyboardEvent) => {
+        console.log(event.code)
+        switch (event.code) {
+          case "KeyB":
+            set_mode(DrawMode.Brush);
+            break;
+          case "KeyF":
+            set_mode(DrawMode.Fill);
+            break;
+          case "KeyE":
+            set_mode(DrawMode.Eraser);
+            break;
+        }
       }
 
       let local_clipboard: p5.Image;
