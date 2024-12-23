@@ -1,8 +1,9 @@
 import { DrawMode, DrawModeName, Layer } from "@/app/page";
 import p5 from "p5";
 import { RefObject } from "react";
+import { CanvasCapture } from 'canvas-capture';
 
-export default function Details({ mode, layers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
+export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
     current_frame.begin();
@@ -101,9 +102,48 @@ export default function Details({ mode, layers, layerCursor, frame, p5sketch } :
     </div>
   );
 
+  const export_vid = () => {
+    CanvasCapture.init(
+      document.getElementById("defaultCanvas0")! as HTMLCanvasElement,
+      { showRecDot: true }, // Options are optional, more info below.
+    );
+    CanvasCapture.beginVideoRecord({ format: CanvasCapture.WEBM, fps: fps });
+    const num_frames = getNumFrames();
+    /*
+    let i = 0;
+    const render_frame = () => {
+      p5sketch.current!.clear();
+      for (const layer of layers) {
+        if (layer.visible)
+          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
+      }
+      CanvasCapture.recordFrame();
+
+      if (i < num_frames) {
+        i++;
+        console.log(i);
+        requestAnimationFrame(render_frame);
+      }
+      else {
+        CanvasCapture.stopRecord();
+      }
+    }
+    requestAnimationFrame(render_frame);
+    */
+    for (let i = 0; i < num_frames; i++) {
+      p5sketch.current!.clear();
+      for (const layer of layers) {
+        if (layer.visible)
+          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
+      }
+      CanvasCapture.recordFrame();
+    }
+    CanvasCapture.stopRecord();
+  }
+
   const export_details = (
     <div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_vid}>Clear</button>
     </div>
   );
 

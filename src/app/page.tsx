@@ -61,6 +61,7 @@ export default function Home() {
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
   ]);
+  const get_num_frames = () => layers[0].frames.length;
   const [layerCursor, setLayerCursor] = useState<number>(0);
   const [frame, setFrame] = useState<number>(0);
   const [fps, setFps] = useState<number>(60);
@@ -73,7 +74,7 @@ export default function Home() {
         <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps}></Timeline>
       </div>
-      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Details>
+      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch}></Details>
     </div>
   );
 }
