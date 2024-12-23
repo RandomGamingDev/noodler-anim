@@ -53,6 +53,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         canvas = sketch.createCanvas(x_res, y_res, sketch.WEBGL);
         canvas.parent(canvas_container.current!);
         canvas.style('image-rendering', 'pixelated');
+        canvas.style('background-color', 'white');
 
         // Initialize frame buffer
         //write_buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
@@ -137,7 +138,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         write_buf = current_frame;
 
         // Foreground aka UI rendering
-        sketch.background(0);
+        sketch.clear();
         sketch.translate(-sketch.width / 2, -sketch.height / 2);
 
         { // Frame
