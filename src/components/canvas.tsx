@@ -231,7 +231,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             sketch.pop();
             break;
           case DrawMode.Fill:
-            if (sketch.mouseIsPressed) {
+            if (sketch.mouseIsPressed && sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width) {
               write_buf.begin(); // Fix this and then the rest os just timeline pixel tool and hooking up settings
               {
                 graphics.clear();
@@ -242,12 +242,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
                 sketch.clear();
                 (graphics.drawingContext as CanvasRenderingContext2D).putImageData(flood_fill.imageData, 0, 0);
                 sketch.image(graphics, -sketch.width / 2, -sketch.height / 2);
-
-                //(write_buf as unknown as { updatePixels: () => void }).updatePixels();
-                /*
-                if (sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width)
-                  floodFill(sketch, write_buf, sketch.createVector(sketch.mouseX, sketch.mouseY), [255, 0, 0, 255]);
-                */
               }
               write_buf.end();
             }
