@@ -3,8 +3,7 @@
 import { Reference, RefObject, useEffect, useRef } from "react";
 import p5 from "p5";
 import { DrawMode, Layer } from "@/app/page";
-import dynamic from "next/dynamic";
-import { floodFill } from "@/shared/floodfill";
+import FloodFill from 'q-floodfill';
 
 export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
@@ -43,6 +42,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       let was_pressed_keys: { [id: string]: boolean } = {};
       const pressed_keys: { [id: string]: boolean } = {};
       let write_buf: p5.Framebuffer;
+      let graphics: p5.Graphics;
 
       const get_canvas_dims = () => [Number(canvas.elt.style.width.slice(0, -2)), Number(canvas.elt.style.height.slice(0, -2))];
 
@@ -54,6 +54,8 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         canvas.parent(canvas_container.current!);
         canvas.style('image-rendering', 'pixelated');
         canvas.style('background-color', 'white');
+
+        graphics = sketch.createGraphics(x_res, y_res);
 
         // Initialize frame buffer
         //write_buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
@@ -232,8 +234,20 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             if (sketch.mouseIsPressed) {
               write_buf.begin(); // Fix this and then the rest os just timeline pixel tool and hooking up settings
               {
+                graphics.clear();
+                (write_buf as unknown as { loadPixels: () => void }).loadPixels();
+                const img = new ImageData(new Uint8ClampedArray(write_buf.pixels), sketch.width, sketch.height);
+                const flood_fill = new FloodFill(img);
+                flood_fill.fill("#ff0000", Math.floor(sketch.mouseX), Math.floor(sketch.mouseY), 0);
+                sketch.clear();
+                (graphics.drawingContext as CanvasRenderingContext2D).putImageData(flood_fill.imageData, 0, 0);
+                sketch.image(graphics, -sketch.width / 2, -sketch.height / 2);
+
+                //(write_buf as unknown as { updatePixels: () => void }).updatePixels();
+                /*
                 if (sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width)
                   floodFill(sketch, write_buf, sketch.createVector(sketch.mouseX, sketch.mouseY), [255, 0, 0, 255]);
+                */
               }
               write_buf.end();
             }
