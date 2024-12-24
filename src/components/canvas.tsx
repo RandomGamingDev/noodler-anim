@@ -1,9 +1,9 @@
 'use client'
 
 import { Dispatch, RefObject, useEffect, useRef } from "react";
-import p5 from "p5";
 import { DrawMode, Layer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
+import p5 from "p5";
 
 export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode, settings } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);

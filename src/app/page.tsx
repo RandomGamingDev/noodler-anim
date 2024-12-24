@@ -1,12 +1,20 @@
 'use client'
 
-import Canvas from "@/components/canvas";
-import Details from "@/components/details";
+//import Canvas from "@/components/canvas";
+import dynamic from "next/dynamic";
+const Canvas = dynamic(() => import("@/components/canvas"), {
+  ssr: false, // Disable server-side rendering
+});
+const Details = dynamic(() => import("@/components/details"), {
+  ssr: false, // Disable server-side rendering
+});
+
+//import Details from "@/components/details";
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
 import { DrawMode, DrawModeName, Layer, Settings } from "@/shared/shared";
-import p5 from "p5";
 import { useRef, useState } from "react";
+import p5 from "p5";
 
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Information);
