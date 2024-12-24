@@ -1,15 +1,15 @@
-import { Layer } from "@/app/page";
+import { Layer } from "@/shared/shared";
 import { Dispatch, useEffect, useState } from "react";
 
 export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps } : { layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number> }) {
-  const back = (e: React.MouseEvent) => {
+  const back = () => {
     setFrame((frame - 1) % layers[0].frames.length);
   }
   const [playing, setPlaying] = useState(false);
-  const play = (e: React.MouseEvent) => {
+  const play = () => {
     setPlaying(!playing);
   }
-  const forward = (e: React.MouseEvent) => {
+  const forward = () => {
     setFrame((frame + 1) % layers[0].frames.length);
   }
 

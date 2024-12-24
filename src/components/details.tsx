@@ -1,4 +1,4 @@
-import { DrawMode, DrawModeName, Layer, Settings } from "@/app/page";
+import { DrawMode, DrawModeName, Layer, Settings } from "@/shared/shared";
 import p5 from "p5";
 import { Dispatch, RefObject } from "react";
 import { CanvasCapture } from 'canvas-capture';
@@ -110,7 +110,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     </div>
   );
 
-  const download_save = (e: React.MouseEvent) => {
+  const download_save = () => {
     
 
     /*

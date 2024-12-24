@@ -1,34 +1,33 @@
 'use client'
 
-import { DrawMode, DrawModeName } from "@/app/page";
-import { Dispatch, SetStateAction } from "react";
+import { DrawMode, DrawModeName } from "@/shared/shared";
 
-export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode, e: React.MouseEvent<SVGSVGElement, MouseEvent>) => void }) {
-  const clear_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode) => void }) {
+  const clear_mode = () => {
     set_mode(DrawMode.Clear);
   };
-  const select_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const select_mode = () => {
     set_mode(DrawMode.Select);
   };
-  const brush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const brush_mode = () => {
     set_mode(DrawMode.Brush);
   };
-  const pixelbrush_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
-    set_mode(DrawMode.PixelBrush, e);
+  const pixelbrush_mode = () => {
+    set_mode(DrawMode.PixelBrush);
   };
-  const fill_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const fill_mode = () => {
     set_mode(DrawMode.Fill);
   };
-  const eraser_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const eraser_mode = () => {
     set_mode(DrawMode.Eraser);
   };
-  const download_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const download_mode = () => {
     set_mode(DrawMode.Download);
   };
-  const export_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const export_mode = () => {
     set_mode(DrawMode.Export);
   };
-  const information_mode = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+  const information_mode = () => {
     set_mode(DrawMode.Information);
   };
 

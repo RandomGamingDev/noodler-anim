@@ -1,8 +1,8 @@
 'use client'
 
-import { Dispatch, Reference, RefObject, useEffect, useRef } from "react";
+import { Dispatch, RefObject, useEffect, useRef } from "react";
 import p5 from "p5";
-import { DrawMode, DrawModeName, Layer, Settings } from "@/app/page";
+import { DrawMode, Layer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
 
 export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode, settings } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings }) {
@@ -41,7 +41,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       let canvas: p5.Renderer;
       const last_mouse_pos = [0, 0];
       let mouse_was_pressed = false;
-      let was_pressed_keys: { [id: string]: boolean } = {};
+      //let was_pressed_keys: { [id: string]: boolean } = {};
       const pressed_keys: { [id: string]: boolean } = {};
       let write_buf: p5.Framebuffer;
       let graphics: p5.Graphics;
@@ -70,7 +70,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         setLayers([...layersRef.current!]);
 
         { // Set canvas position
-          const canvas_container_loc = [canvas_container.current!.offsetLeft, canvas_container.current!.offsetTop];
           const canvas_container_dims = [canvas_container.current!.offsetWidth, canvas_container.current!.offsetHeight];
         
           const canvas_dims = get_canvas_dims();
@@ -122,17 +121,19 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         canvas.style('height', `${canvas_dims[1] + coord_dif[1]}px`);
       }
 
-      let mouse_pressed_loc = [0, 0];
-      sketch.mousePressed = (event: MouseEvent) => {
+      const mouse_pressed_loc = [0, 0];
+      sketch.mousePressed = () => {
         mouse_pressed_loc[0] = sketch.mouseX;
         mouse_pressed_loc[1] = sketch.mouseY;
       }
 
-      let mouse_released_loc = [0, 0];
-      sketch.mouseReleased = (event: MouseEvent) => {
+      /*
+      const mouse_released_loc = [0, 0];
+      sketch.mouseReleased = () => {
         mouse_released_loc[0] = sketch.mouseX;
         mouse_released_loc[1] = sketch.mouseY;
       }
+      */
 
       sketch.keyPressed = (event: KeyboardEvent) => {
         switch (event.code) {
@@ -294,7 +295,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
           last_mouse_pos[0] = sketch.mouseX;
           last_mouse_pos[1] = sketch.mouseY;
           mouse_was_pressed = sketch.mouseIsPressed;
-          was_pressed_keys = { ...pressed_keys };
+          //was_pressed_keys = { ...pressed_keys };
         }
       };
     };
