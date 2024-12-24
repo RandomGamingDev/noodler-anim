@@ -54,6 +54,31 @@ export class Layer {
   }
 }
 
+export class Settings {
+  brush_color: string
+  brush_radius: number
+  pixelbrush_size: number
+  fill_color: string
+  fill_threshold: number
+  eraser_radius: number
+
+  constructor(
+    brush_color: string = "#000000",
+    brush_radius: number = 25,
+    pixelbrush_size: number = 1,
+    fill_color: string = "#000000",
+    fill_threshold: number = 0,
+    eraser_radius: number = 25
+  ) {
+    this.brush_color = brush_color;
+    this.brush_radius = brush_radius;
+    this.pixelbrush_size = pixelbrush_size;
+    this.fill_color = fill_color;
+    this.fill_threshold = fill_threshold;
+    this.eraser_radius = eraser_radius;
+  }
+}
+
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Information);
   const set_mode = (mode: DrawMode) => {
@@ -80,15 +105,16 @@ export default function Home() {
   const [frame, setFrame] = useState<number>(0);
   const [fps, setFps] = useState<number>(60);
   const p5sketch = useRef<p5>(null);
+  const [settings, setSettings] = useState<Settings>(new Settings());
 
   return (
     <div className="flex">
       <Sidebar set_mode={set_mode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch} set_mode={set_mode}></Canvas>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch} set_mode={set_mode} settings={settings}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps}></Timeline>
       </div>
-      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch}></Details>
+      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings}></Details>
     </div>
   );
 }

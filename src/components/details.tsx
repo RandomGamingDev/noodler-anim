@@ -1,9 +1,9 @@
-import { DrawMode, DrawModeName, Layer } from "@/app/page";
+import { DrawMode, DrawModeName, Layer, Settings } from "@/app/page";
 import p5 from "p5";
-import { RefObject } from "react";
+import { Dispatch, RefObject } from "react";
 import { CanvasCapture } from 'canvas-capture';
 
-export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null> }) {
+export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
     current_frame.begin();
@@ -35,11 +35,17 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
         <tbody>
           <tr>
             <th><h2 className="font-normal p-2">Brush Color</h2></th>
-            <th><input className="m-1" type="color" /></th>
+            <th><input value={settings.brush_color} onChange={(e) => {
+              settings.brush_color = e.currentTarget.value;
+              setSettings({... settings});
+            }} className="m-1" type="color" /></th>
           </tr>
           <tr>
             <th><h2 className="font-normal p-2">Brush Radius</h2></th>
-            <th><input className="m-1 max-w-16 text-black" type="number" /></th>
+            <th><input value={settings.brush_radius} onChange={(e) => {
+              settings.brush_radius = Number(e.currentTarget.value);
+              setSettings({... settings});
+            }} className="m-1 max-w-16 text-black" type="number" /></th>
           </tr>
         </tbody>
       </table>
@@ -53,7 +59,10 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
         <tbody>
           <tr>
             <th><h2 className="font-normal p-2">Brush Size</h2></th>
-            <th><input className="m-1 max-w-16 text-black" type="number" /></th>
+            <th><input value={settings.pixelbrush_size} onChange={(e) => {
+              settings.pixelbrush_size = Number(e.currentTarget.value);
+              setSettings({... settings});
+            }} className="m-1 max-w-16 text-black" type="number" /></th>
           </tr>
         </tbody>
       </table>
@@ -67,11 +76,17 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
         <tbody>
           <tr>
             <th><h2 className="font-normal p-2">Fill Color</h2></th>
-            <th><input className="m-1" type="color" /></th>
+            <th><input value={settings.fill_color} onChange={(e) => {
+              settings.fill_color = e.currentTarget.value;
+              setSettings({... settings});
+            }} className="m-1" type="color" /></th>
           </tr>
           <tr>
             <th><h2 className="font-normal p-2">Threshold</h2></th>
-            <th><input className="m-1 max-w-16 text-black" type="number" /></th>
+            <th><input value={settings.fill_threshold} onChange={(e) => {
+              settings.fill_threshold = Number(e.currentTarget.value);
+              setSettings({... settings});
+            }} className="m-1 max-w-16 text-black" type="number" /></th>
           </tr>
         </tbody>
       </table>
@@ -84,12 +99,11 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
         <thead></thead>
         <tbody>
           <tr>
-            <th><h2 className="font-normal p-2">Eraser Color</h2></th>
-            <th><input className="m-1" type="color" /></th>
-          </tr>
-          <tr>
             <th><h2 className="font-normal p-2">Brush Radius</h2></th>
-            <th><input className="m-1 max-w-16 text-black" type="number" /></th>
+            <th><input value={settings.eraser_radius} onChange={(e) => {
+              settings.eraser_radius = Number(e.currentTarget.value);
+              setSettings({... settings});
+            }} className="m-1 max-w-16 text-black" type="number" /></th>
           </tr>
         </tbody>
       </table>

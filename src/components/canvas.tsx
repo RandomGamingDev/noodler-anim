@@ -2,21 +2,23 @@
 
 import { Dispatch, Reference, RefObject, useEffect, useRef } from "react";
 import p5 from "p5";
-import { DrawMode, DrawModeName, Layer } from "@/app/page";
+import { DrawMode, DrawModeName, Layer, Settings } from "@/app/page";
 import FloodFill from 'q-floodfill';
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode, settings } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
   const layersRef = useRef(layers);
   const layerCursorRef = useRef(layerCursor);
   const frameRef = useRef(frame);
+  const settingsRef = useRef(settings);
   useEffect(() => {
     modeRef.current = mode;
     layersRef.current = layers;
     layerCursorRef.current = layerCursor;
     frameRef.current = frame;
+    settingsRef.current = settings;
   });
 
   const input_x_res: RefObject<HTMLInputElement | null> = useRef(null);
@@ -133,7 +135,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       }
 
       sketch.keyPressed = (event: KeyboardEvent) => {
-        console.log(event.code)
         switch (event.code) {
           case "KeyB":
             set_mode(DrawMode.Brush);
@@ -211,15 +212,15 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
               sketch.stroke(200);
               sketch.strokeWeight(1);
               sketch.noFill();
-              sketch.circle(sketch.mouseX, sketch.mouseY, 25);
+              sketch.circle(sketch.mouseX, sketch.mouseY, settingsRef.current!.brush_radius);
 
               // Draw
               if (mouse_was_pressed && sketch.mouseIsPressed) {
                 write_buf.begin();
                 sketch.translate(-sketch.width / 2, -sketch.height / 2);
                 {
-                  sketch.stroke("red"); // Placeholder
-                  sketch.strokeWeight(25);
+                  sketch.stroke(settingsRef.current!.brush_color);
+                  sketch.strokeWeight(settingsRef.current!.brush_radius);
                   sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
                 }
                 write_buf.end();
@@ -228,17 +229,19 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
             sketch.pop();
             break;
           case DrawMode.PixelBrush:
+            if (local_clipboard == undefined)
+              break;
             sketch.push();
             {
               // Draw cursor
-              sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2);
+              sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
 
               // Draw
               if (mouse_was_pressed && sketch.mouseIsPressed) {
                 write_buf.begin();
                 sketch.translate(-sketch.width / 2, -sketch.height / 2);
                 {
-                  sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2);
+                  sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
                 }
                 write_buf.end();
               }
@@ -253,7 +256,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
                 (write_buf as unknown as { loadPixels: () => void }).loadPixels();
                 const img = new ImageData(new Uint8ClampedArray(write_buf.pixels), sketch.width, sketch.height);
                 const flood_fill = new FloodFill(img);
-                flood_fill.fill("#ff0000", Math.floor(sketch.mouseX), Math.floor(sketch.mouseY), 0);
+                flood_fill.fill(settingsRef.current!.fill_color, Math.floor(sketch.mouseX), Math.floor(sketch.mouseY), settingsRef.current!.fill_threshold);
                 sketch.clear();
                 (graphics.drawingContext as CanvasRenderingContext2D).putImageData(flood_fill.imageData, 0, 0);
                 sketch.image(graphics, -sketch.width / 2, -sketch.height / 2);
@@ -268,7 +271,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
               sketch.stroke(200);
               sketch.strokeWeight(1);
               sketch.noFill();
-              sketch.circle(sketch.mouseX, sketch.mouseY, 25);
+              sketch.circle(sketch.mouseX, sketch.mouseY, settingsRef.current!.eraser_radius);
 
               // Draw
               if (mouse_was_pressed && sketch.mouseIsPressed) {
@@ -276,7 +279,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
                 sketch.translate(-sketch.width / 2, -sketch.height / 2);
                 {
                   sketch.erase(); // Placeholder
-                  sketch.strokeWeight(25);
+                  sketch.strokeWeight(settingsRef.current!.eraser_radius);
                   sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
                   sketch.noErase();
                 }
