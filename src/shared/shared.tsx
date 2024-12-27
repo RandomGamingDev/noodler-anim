@@ -35,12 +35,45 @@ export function DrawModeName(draw_mode: DrawMode) {
   }
 }
 
+async function bufferToBase64(buffer: Uint8Array) {
+  // use a FileReader to generate a base64 data URI:
+  const base64url = await new Promise(r => {
+    const reader = new FileReader()
+    reader.onload = () => r(reader.result! as string)
+    reader.readAsDataURL(new Blob([buffer]))
+  }) as string;
+  // remove the `data:...;base64,` part from the start
+  return base64url.slice(base64url.indexOf(',') + 1);
+}
+
 export class Layer {
   visible: boolean
   name: string
   frames: Array<p5.Framebuffer>
 
   constructor(visible: boolean, name: string, frames: Array<p5.Framebuffer>) {
+    this.visible = visible;
+    this.name = name;
+    this.frames = frames;
+  }
+
+  async serialize() {
+    const serialized_frames: Array<string> = [];
+    for (const frame of this.frames) {
+      (frame as unknown as { loadPixels: () => void }).loadPixels();
+      serialized_frames.push(await bufferToBase64(frame.pixels as unknown as Uint8Array));
+    }
+
+    return new SerializedLayer(this.visible, this.name, serialized_frames);
+  }
+}
+
+export class SerializedLayer {
+  visible: boolean
+  name: string
+  frames: Array<string>
+
+  constructor(visible: boolean, name: string, frames: Array<string>) {
     this.visible = visible;
     this.name = name;
     this.frames = frames;
@@ -70,4 +103,24 @@ export class Settings {
     this.fill_threshold = fill_threshold;
     this.eraser_radius = eraser_radius;
   }
+}
+
+export class Save {
+  res: Array<number>
+  fps: number
+  layers: Array<SerializedLayer>
+
+  constructor(res: Array<number>, fps: number, layers: Array<SerializedLayer>) {
+    this.res = res;
+    this.fps = fps;
+    this.layers = layers;
+  }
+}
+
+export function download_file(content: string, fileName: string, contentType: string) {
+  const a = document.createElement("a");
+  const file = new Blob([content], {type: contentType});
+  a.href = URL.createObjectURL(file);
+  a.download = fileName;
+  a.click();
 }
