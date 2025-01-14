@@ -1,6 +1,7 @@
 import p5 from "p5";
 
 export enum DrawMode {
+  Create,
   Clear,
   Select,
   Brush,
@@ -14,6 +15,8 @@ export enum DrawMode {
 
 export function DrawModeName(draw_mode: DrawMode) {
   switch (draw_mode) {
+    case DrawMode.Create:
+      return "Create";
     case DrawMode.Clear:
       return "Clear";
     case DrawMode.Select:

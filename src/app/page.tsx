@@ -17,9 +17,8 @@ import { useRef, useState } from "react";
 import p5 from "p5";
 
 export default function Home() {
-  const [mode, setMode] = useState(DrawMode.Information);
+  const [mode, setMode] = useState(DrawMode.Create);
   const set_mode = (mode: DrawMode) => {
-    //const clicked = e.currentTarget;
     const clicked = document.getElementById(DrawModeName(mode).toLowerCase())!;
     clicked.setAttribute("stroke", "#ADD8E6");
     clicked.setAttribute("fill", "#ADD8E6");
@@ -27,8 +26,10 @@ export default function Home() {
       if (mode == prev_mode)
         return prev_mode;
       const unselected = document.getElementById(DrawModeName(prev_mode).toLowerCase());
-      unselected!.setAttribute("stroke", "currentColor");
-      unselected!.setAttribute("fill", "currentColor");
+      if (unselected != null) {
+        unselected!.setAttribute("stroke", "currentColor");
+        unselected!.setAttribute("fill", "currentColor");
+      }
       return mode;
     });
   }

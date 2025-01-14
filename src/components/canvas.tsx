@@ -91,6 +91,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       sketch.mouseMoved = (e: MouseEvent) => {
         const canvas_pos = canvas.position() as { x: number, y: number };
 
+        console.log(sketch.mouseIsPressed);
         if (pressed_keys["Space"]) {
           sketch.cursor(sketch.ARROW);
           canvas.position(

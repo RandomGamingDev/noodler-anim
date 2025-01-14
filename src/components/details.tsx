@@ -11,6 +11,16 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     current_frame.end();
   }
 
+  const create_details = (
+    <div className="text-left">
+      <table>
+        <thead></thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  );
+
   const clear_details = (
     <div className="text-left">
       <table>
@@ -211,6 +221,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
       <h1 className="text-xl font-bold">{ DrawModeName(mode) }</h1>
       {
         [
+          create_details,
           clear_details,
           select_details,
           brush_details,
