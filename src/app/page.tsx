@@ -44,13 +44,14 @@ export default function Home() {
   const [fps, setFps] = useState<number>(60);
   const p5sketch = useRef<p5>(null);
   const [settings, setSettings] = useState<Settings>(new Settings());
+  const [playing, setPlaying] = useState(false);
 
   return (
     <div className="flex">
       <Sidebar set_mode={set_mode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch} set_mode={set_mode} settings={settings}></Canvas>
-        <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps}></Timeline>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying}></Canvas>
+        <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying}></Timeline>
       </div>
       <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings}></Details>
     </div>

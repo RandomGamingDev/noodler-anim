@@ -1,11 +1,11 @@
 import { Layer } from "@/shared/shared";
-import { Dispatch, useEffect, useState } from "react";
+import { Dispatch, useEffect } from "react";
+import DraggableInput from "./draggable-input";
 
-export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps } : { layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number> }) {
+export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps, playing, setPlaying } : { layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number>, playing: boolean, setPlaying: Dispatch<boolean> }) {
   const back = () => {
     setFrame((frame - 1) % layers[0].frames.length);
   }
-  const [playing, setPlaying] = useState(false);
   const play = () => {
     setPlaying(!playing);
   }
@@ -43,12 +43,12 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
         </div>
         <div className="flex pl-3">
           <p>Frame</p>
-          <input type="number" value={frame} onChange={(e) => setFrame(Number(e.currentTarget.value))} pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
+          <DraggableInput frame={frame} setFrame={setFrame}></DraggableInput>
           <p>FPS</p>
-          <input  type="number" value={fps} onChange={(e) => setFps(Number(e.currentTarget.value))} pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
+          <DraggableInput frame={frame} setFrame={setFrame}></DraggableInput>
         </div>
       </div>
-      <div>
+      <div className="overflow-scroll h-[85%]">
         {
           layers.map((e, i) => (
             <div className="flex border border-gray-700" id={`layers-row-${i}`} key={`layers-row-${i}`}>

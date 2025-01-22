@@ -3,9 +3,9 @@
 import { Dispatch, RefObject, useEffect, useRef } from "react";
 import { DrawMode, Layer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
-import p5 from "p5";
+import p5, { Framebuffer } from "p5";
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5sketch, set_mode, settings } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, getNumFrames, playing, setPlaying } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -13,6 +13,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
   const layerCursorRef = useRef(layerCursor);
   const frameRef = useRef(frame);
   const settingsRef = useRef(settings);
+  const playingRef = useRef(playing);
   useEffect(() => {
     modeRef.current = mode;
     layersRef.current = layers;
@@ -91,9 +92,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
       sketch.mouseMoved = (e: MouseEvent) => {
         const canvas_pos = canvas.position() as { x: number, y: number };
 
-        console.log(sketch.mouseIsPressed);
-        if (pressed_keys["Space"]) {
-          sketch.cursor(sketch.ARROW);
+        if (pressed_keys["Space"] && sketch.mouseIsPressed) {
           canvas.position(
             canvas_pos.x + e.movementX,
             canvas_pos.y + e.movementY
@@ -101,13 +100,23 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         }
       }
 
+      sketch.mouseDragged = sketch.mouseMoved;
+
       const cursor_handler = () => {
         const canvas_dims = get_canvas_dims();
 
         // Make mouse cursor disappear when on canvas
         if (sketch.mouseX < 0 || sketch.mouseX >= canvas_dims[0] || sketch.mouseY < 0 || sketch.mouseY >= canvas_dims[1])
           return;
-        sketch.noCursor();
+        switch (modeRef.current!) {
+          case DrawMode.Brush:
+          case DrawMode.Eraser:
+            sketch.noCursor();
+            break;
+          default:
+            sketch.cursor(sketch.CROSS);
+            break;
+        }
       }
 
       sketch.mouseWheel = (event: WheelEvent) => {
@@ -147,6 +156,20 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
           case "KeyE":
             set_mode(DrawMode.Eraser);
             break;
+          case "KeyN": // New Layer
+            setLayers([...layersRef.current!, new Layer(true, "Untitled", new Array(getNumFrames()).fill(undefined).map(() => sketch.createFramebuffer() as unknown as p5.Framebuffer))]);
+            break;
+          case "Comma": // Previous frame
+            setFrame((frameRef.current! - 1 + getNumFrames()) % getNumFrames());
+            break;
+          case "Period": // Next frame
+            setFrame((frameRef.current! + 1) % getNumFrames());
+            break;
+          case "Slash": // Play/Pause
+            event.preventDefault();
+            console.log(playingRef.current!);
+            setPlaying(!(playingRef.current!)); // FIX
+            break;
         }
       }
 
@@ -171,7 +194,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, p5
         }
 
         // Handle different tools
-        switch (modeRef.current) {
+        switch (modeRef.current!) {
           case DrawMode.Select:
             if (sketch.mouseIsPressed) {
               sketch.push();

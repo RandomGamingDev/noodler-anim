@@ -185,7 +185,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
         <tbody>
           {
             [
-              ["New Page", "Ctrl + N"],
+              ["New Layer", "N"],
               ["Save", "Ctrl + S"],
               ["Brush", "B"],
               ["Grab brush", "G"],
