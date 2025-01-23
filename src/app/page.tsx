@@ -34,11 +34,13 @@ export default function Home() {
     });
   }
   const [layers, setLayers] = useState<Array<Layer>>([
+    /* Test Layers
     new Layer(true, "test1", []),
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
+    //*/
   ]);
-  const get_num_frames = () => layers[0].frames.length;
+  const get_num_frames = () => layers.length > 0 ? layers[0].frames.length : 0;
   const [layerCursor, setLayerCursor] = useState<number>(0);
   const [frame, setFrame] = useState<number>(0);
   const [fps, setFps] = useState<number>(60);
@@ -50,8 +52,8 @@ export default function Home() {
     <div className="flex">
       <Sidebar set_mode={set_mode}></Sidebar>
       <div className="w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying}></Canvas>
-        <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying}></Timeline>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying}></Canvas>
+        <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
       <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings}></Details>
     </div>

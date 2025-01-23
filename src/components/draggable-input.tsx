@@ -14,15 +14,24 @@ export default function DraggableInput({ value, onChange } : { value: number, on
 			isDragging = true;
 
 			// Prevent text selection while dragging
-			event.preventDefault();
+			//event.preventDefault();
 		});
 
 		document.addEventListener('mousemove', (event) => {
-			if (isDragging) {
-				const diffY = startY - event.clientY;
-				const step = 1; // Adjust step size as needed
-				inputRef.current!.value = String(startValue + Math.floor(diffY / step));
-			}
+			if (!isDragging)
+				return;
+			const diffY = startY - event.clientY;
+			const step = 1; // Adjust step size as needed
+			inputRef.current!.value = String(startValue + Math.floor(diffY / step));
+			//inputRef.current!.dispatchEvent(new Event("change"));
+
+			// Use React's onChange handler directly
+			const syntheticEvent = {
+				currentTarget: inputRef.current!,
+				target: inputRef.current!
+			} as React.ChangeEvent<HTMLInputElement>;
+			
+			onChange(syntheticEvent);
 		});
 
 		document.addEventListener('mouseup', () => {
@@ -33,7 +42,7 @@ export default function DraggableInput({ value, onChange } : { value: number, on
 
 		// Optional: prevent default scroll behavior if input is focused
 		inputRef.current!.addEventListener('wheel', (event) => event.preventDefault());
-	}, [inputRef])
+	}, [inputRef, onChange])
 
 	return (
 		<input type="number" ref={inputRef} value={value} onChange={onChange} pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>

@@ -127,3 +127,5 @@ export function download_file(content: string, fileName: string, contentType: st
   a.download = fileName;
   a.click();
 }
+
+export const wrapmod = (num: number, mod: number) => num < 0 ? (mod - Math.abs(num % mod)) % mod : Math.abs(num % mod);

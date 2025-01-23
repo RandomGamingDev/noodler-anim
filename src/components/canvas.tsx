@@ -5,7 +5,7 @@ import { DrawMode, Layer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
 import p5, { Framebuffer } from "p5";
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, getNumFrames, playing, setPlaying } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -60,14 +60,8 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
         graphics = sketch.createGraphics(x_res, y_res);
 
-        // Initialize frame buffer
-        //write_buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
         // Test
-        for (let i = 0; i < 3; i++)
-          for (const layer of layersRef.current!) {
-            const buf = sketch.createFramebuffer() as unknown as p5.Framebuffer;
-            layer.frames.push(buf);
-          }
+        layersRef.current!.push(new Layer(true, "Background", [sketch.createFramebuffer() as unknown as p5.Framebuffer]));
         setLayers([...layersRef.current!]);
 
         { // Set canvas position
@@ -231,6 +225,14 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             }
             break;
           case DrawMode.Brush:
+            if (pressed_keys["BracketLeft"]) {
+              settings.brush_radius -= 1;
+              setSettings({...settings});
+            }
+            if (pressed_keys["BracketRight"]) {
+              settings.brush_radius += 1;
+              setSettings({...settings});
+            }
             sketch.push();
             {
               // Draw cursor
