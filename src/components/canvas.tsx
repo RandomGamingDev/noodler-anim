@@ -1,9 +1,10 @@
 'use client'
 
-import { Dispatch, RefObject, useEffect, useRef } from "react";
+import { Dispatch, RefObject, useEffect, useRef, useState } from "react";
 import { DrawMode, Layer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
 import p5, { Framebuffer } from "p5";
+import FileDrop from "./file-drop";
 
 export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
@@ -292,6 +293,14 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             }
             break;
           case DrawMode.Eraser:
+            if (pressed_keys["BracketLeft"]) {
+              settings.eraser_radius -= 1;
+              setSettings({...settings});
+            }
+            if (pressed_keys["BracketRight"]) {
+              settings.eraser_radius += 1;
+              setSettings({...settings});
+            }
             sketch.push();
             {
               // Draw cursor
@@ -328,6 +337,21 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     p5sketch.current = new p5(s);
   }
 
+  /*
+  const [droppedFile, setDroppedFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); // Prevent default behavior
+    setIsDragging(false);
+
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      setDroppedFile(e.dataTransfer.files[0]); // Get the first file
+      e.dataTransfer.clearData(); // Clear drag data
+    }
+  };
+  */
+ // onDrop={handleDrop}
   return (
     <div className="w-full h-[80%] bg-gray-950 z-0 overflow-hidden relative flex content-center align-middle text-center justify-center" ref={canvas_container}>
       <div className="pt-[20%]">

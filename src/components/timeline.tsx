@@ -44,17 +44,17 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
         </div>
         <div className="flex pl-3">
           <p>Frame</p>
-          <DraggableInput value={frame} onChange={(e) => {
+          <DraggableInput value={frame} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
             const numFrames = getNumFrames();
             console.log(numFrames);
             setFrame(wrapmod(Number(e.currentTarget.value), numFrames));
           }}></DraggableInput>
           <p>FPS</p>
-          <DraggableInput value={fps} onChange={(e) => {
+          <DraggableInput value={fps} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
             setFps(Number(e.currentTarget.value))
           }}></DraggableInput>
           <p>Length</p>
-          <DraggableInput value={getNumFrames()} onChange={(e) => {
+          <DraggableInput value={getNumFrames()} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
             const newNumFrames = Number(e.currentTarget.value);
             const frameDif = newNumFrames - getNumFrames();
             if (frameDif >= 0) {

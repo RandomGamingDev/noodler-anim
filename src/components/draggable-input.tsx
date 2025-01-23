@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export default function DraggableInput({ value, onChange } : { value: number, onChange: (event: React.ChangeEvent<HTMLInputElement>) => void }) {
+export default function DraggableInput({ value, onChange, className } : { value: number, onChange: (event: React.ChangeEvent<HTMLInputElement>) => void, className: string }) {
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -45,6 +45,6 @@ export default function DraggableInput({ value, onChange } : { value: number, on
 	}, [inputRef, onChange])
 
 	return (
-		<input type="number" ref={inputRef} value={value} onChange={onChange} pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md"></input>
+		<input type="number" ref={inputRef} value={value} onChange={onChange} pattern="[0-9]" className={className}></input>
 	);
 }
