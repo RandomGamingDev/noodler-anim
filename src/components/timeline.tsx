@@ -56,7 +56,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
           <p>Length</p>
           <DraggableInput value={getNumFrames()} onChange={(e) => {
             const newNumFrames = Number(e.currentTarget.value);
-            let frameDif = newNumFrames - getNumFrames();
+            const frameDif = newNumFrames - getNumFrames();
             if (frameDif >= 0) {
               for (let i = 0; i < frameDif; i++)
                 for (const layer of layers) {

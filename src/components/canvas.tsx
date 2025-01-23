@@ -20,6 +20,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     layerCursorRef.current = layerCursor;
     frameRef.current = frame;
     settingsRef.current = settings;
+    playingRef.current = playing;
   });
 
   const input_x_res: RefObject<HTMLInputElement | null> = useRef(null);
@@ -161,8 +162,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             break;
           case "Slash": // Play/Pause
             event.preventDefault();
-            console.log(playingRef.current!);
-            setPlaying(!(playingRef.current!)); // FIX
+            setPlaying(!playingRef.current!);
             break;
         }
       }
