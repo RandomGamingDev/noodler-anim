@@ -1,9 +1,9 @@
 import { Layer, wrapmod } from "@/shared/shared";
-import { Dispatch, RefObject, useEffect } from "react";
+import { Dispatch, RefObject, SetStateAction, useEffect } from "react";
 import DraggableInput from "./draggable-input";
 import p5 from "p5";
 
-export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps, playing, setPlaying, getNumFrames, p5sketch } : { layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number>, playing: boolean, setPlaying: Dispatch<boolean>, getNumFrames: () => number, p5sketch: RefObject<p5 | null> }) {
+export default function Timeline({ layers, setLayers, layerCursor, setLayerCursor, frame, setFrame, fps, setFps, playing, setPlaying, getNumFrames, p5sketch } : { layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Layer[]>>, layerCursor: number, setLayerCursor: Dispatch<number>, frame: number, setFrame: Dispatch<number>, fps: number, setFps: Dispatch<number>, playing: boolean, setPlaying: Dispatch<boolean>, getNumFrames: () => number, p5sketch: RefObject<p5 | null> }) {
   const back = () => {
     setFrame((frame - 1) % layers[0].frames.length);
   }
@@ -55,6 +55,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
           }}></DraggableInput>
           <p>Length</p>
           <DraggableInput value={getNumFrames()} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
+            /*
             const newNumFrames = Number(e.currentTarget.value);
             const frameDif = newNumFrames - getNumFrames();
             if (frameDif >= 0) {
@@ -70,6 +71,24 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
                   layer.frames.splice(layer.frames.length + frameDif, -frameDif);
             }
             setLayers([...layers]);
+            */
+            setLayers((prevLayers) => {
+              const newNumFrames = Number(e.currentTarget.value);
+              const frameDif = newNumFrames - getNumFrames();
+              if (frameDif >= 0) {
+                for (let i = 0; i < frameDif; i++)
+                  for (const layer of prevLayers) {
+                    const buf = p5sketch.current!.createFramebuffer() as unknown as p5.Framebuffer;
+                    layer.frames.push(buf);
+                  }
+              }
+              else {
+                if (getNumFrames() + frameDif > 0)
+                  for (const layer of prevLayers)
+                    layer.frames.splice(layer.frames.length + frameDif, -frameDif);
+              }
+              return [...prevLayers];
+            });
           }}></DraggableInput>
         </div>
       </div>

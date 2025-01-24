@@ -33,13 +33,12 @@ export default function Home() {
       return mode;
     });
   }
-  const [layers, setLayers] = useState<Array<Layer>>([
+  const [layers, setLayers] = useState<Layer[]>([]);
     /* Test Layers
     new Layer(true, "test1", []),
     new Layer(false, "test2", []),
     new Layer(true, "bollocks", [])
     //*/
-  ]);
   const get_num_frames = () => layers.length > 0 ? layers[0].frames.length : 0;
   const [layerCursor, setLayerCursor] = useState<number>(0);
   const [frame, setFrame] = useState<number>(0);
