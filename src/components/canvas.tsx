@@ -41,7 +41,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
       alert("Invalid Resolution Entered!");
       return;
     }
-    input_x_res.current!.parentElement!.parentElement!.remove();
+    //input_x_res.current!.parentElement!.parentElement!.remove();
 
     const s = (sketch: p5) => {
       let canvas: p5.Renderer;
