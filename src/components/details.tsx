@@ -1,4 +1,4 @@
-import { download, download_file, DrawMode, DrawModeName, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
+import { download_file, DrawMode, DrawModeName, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
 import p5 from "p5";
 import { Dispatch, RefObject } from "react";
 import { CanvasCapture } from 'canvas-capture';
@@ -130,7 +130,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
   const download_save = async () => {
     const serialized_layers: Array<SerializedLayer> = [];
     for (const layer of layers)
-      serialized_layers.push(await layer.serialize());
+      serialized_layers.push(await layer.serialize(p5sketch.current!));
     download_file(JSON.stringify(new Save([p5sketch.current!.width, p5sketch.current!.height], fps, serialized_layers)), "save.json", "text/plain");
   }
 
@@ -224,7 +224,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
   );
 
   return (
-    <div className="w-64 min-h-screen max-h-screen bg-gray-800 p-2 border border-gray-700 text-gray-300 overflow-scroll">
+    <div className="min-w-64 w-64 min-h-screen max-h-screen bg-gray-800 p-2 border border-gray-700 text-gray-300 overflow-scroll">
       <h1 className="text-xl font-bold">{ DrawModeName(mode) }</h1>
       {
         [

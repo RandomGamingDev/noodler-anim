@@ -1,4 +1,5 @@
-import p5 from "p5";
+import p5, { Framebuffer } from "p5";
+import { Dispatch, SetStateAction } from "react";
 
 export enum DrawMode {
   Create,
@@ -38,6 +39,7 @@ export function DrawModeName(draw_mode: DrawMode) {
   }
 }
 
+/*
 async function bufferToBase64(buffer: Uint8Array) {
   // use a FileReader to generate a base64 data URI:
   const base64url = await new Promise(r => {
@@ -48,6 +50,7 @@ async function bufferToBase64(buffer: Uint8Array) {
   // remove the `data:...;base64,` part from the start
   return base64url.slice(base64url.indexOf(',') + 1);
 }
+*/
 
 export class Layer {
   visible: boolean
@@ -60,11 +63,14 @@ export class Layer {
     this.frames = frames;
   }
 
-  async serialize() {
+  async serialize(p5sketch: p5) {
     const serialized_frames: Array<string> = [];
     for (const frame of this.frames) {
-      (frame as unknown as { loadPixels: () => void }).loadPixels();
-      serialized_frames.push(await bufferToBase64(frame.pixels as unknown as Uint8Array));
+      p5sketch.clear();
+      p5sketch.image(frame, 0, 0, p5sketch.width, p5sketch.height);
+      serialized_frames.push(((p5sketch as unknown as { canvas: p5.Renderer }).canvas.elt as HTMLCanvasElement).toDataURL());
+      //(frame as unknown as { loadPixels: () => void }).loadPixels();
+      //serialized_frames.push(await bufferToBase64(frame.pixels as unknown as Uint8Array));
     }
 
     return new SerializedLayer(this.visible, this.name, serialized_frames);
@@ -80,6 +86,33 @@ export class SerializedLayer {
     this.visible = visible;
     this.name = name;
     this.frames = frames;
+  }
+
+  static deserialize(thi: SerializedLayer, p5sketch: p5, setLayers: Dispatch<SetStateAction<Layer[]>>) {
+    const deserializedFrames: Array<Framebuffer> = new Array(thi.frames.length);
+    const returnLayer = new Layer(thi.visible, thi.name, deserializedFrames);
+    for (let i = 0; i < thi.frames.length; i++) {
+      /*
+      const layerImg = new Image();
+      layerImg.src = `data:image/png;base64,${this.frames[i]}`;
+      */
+      p5sketch.loadImage(thi.frames[i], (img) => {
+        const layerFB = p5sketch.createFramebuffer() as unknown as p5.Framebuffer;
+        layerFB.begin();
+        p5sketch.image(img, -p5sketch.width / 2, -p5sketch.height / 2);
+        layerFB.end();
+        deserializedFrames[i] = layerFB;
+        setLayers(prevLayers => [...prevLayers]);
+      });
+      /*
+      const layerFB = p5sketch.createFramebuffer() as unknown as p5.Framebuffer;
+      layerFB.begin();
+      p5sketch.image(layerImg, -p5sketch.width / 2, -p5sketch.height / 2);
+      layerFB.end();
+      */
+    }
+
+    return returnLayer;
   }
 }
 

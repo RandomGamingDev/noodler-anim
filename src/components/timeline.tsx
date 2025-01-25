@@ -31,7 +31,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
   }, [fps, frame, layers, playing, setFrame])
 
   return (
-    <div className="w-full h-[20%] bg-gray-800 z-[-1] border border-gray-700">
+    <div className="max-w-full w-full h-[20%] bg-gray-800 z-[-1] border border-gray-700">
       <div className="flex border border-gray-700">
         <div className="flex px-1">
           <svg id="back" onClick={back} strokeWidth={1.5} stroke="currentColor" className="cursor-pointer mx-1 my-1 size-4" viewBox="0 0 13 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.4487 1.67437C11.5135 1.63178 11.5897 1.60648 11.669 1.60124C11.7484 1.59599 11.8277 1.61101 11.8985 1.64463C11.9692 1.67826 12.0285 1.7292 12.0699 1.79188C12.1113 1.85455 12.1333 1.92655 12.1333 1.99997V9.99997C12.1333 10.0734 12.1113 10.1454 12.0699 10.2081C12.0285 10.2707 11.9692 10.3217 11.8985 10.3553C11.8277 10.3889 11.7484 10.4039 11.669 10.3987C11.5897 10.3935 11.5135 10.3682 11.4487 10.3256L5.382 6.32557C5.32582 6.28857 5.28004 6.23972 5.24845 6.18308C5.21685 6.12645 5.20037 6.06367 5.20037 5.99997C5.20037 5.93627 5.21685 5.87349 5.24845 5.81686C5.28004 5.76022 5.32582 5.71137 5.382 5.67437L11.4487 1.67437ZM4.76666 10.3553H3.9V1.55528H4.76666V10.3553Z" fill="white"/></svg>
@@ -95,7 +95,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
       <div className="overflow-scroll h-[85%]">
         {
           layers.map((e, i) => (
-            <div className="flex border border-gray-700" id={`layers-row-${i}`} key={`layers-row-${i}`}>
+            <div className="max-w-full flex border border-gray-700" id={`layers-row-${i}`} key={`layers-row-${i}`}>
               <div className="flex w-32 max-w-32 overflow-x-scroll">
                 {
                   e.visible ? 
@@ -104,7 +104,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
                 }
                 <h2 className="cursor-pointer align-middle mt-[1.5px] text-gray-400">{e.name}</h2>
               </div>
-              <div className="flex pl-3 my-2 align-middle">
+              <div className="max-w-full overflow-scroll flex pl-3 my-2 align-middle">
                 {
                   e.frames.map((fe, fi) => {
                     const frame_id = `layer-${i}-frame-${fi}`;
@@ -120,8 +120,8 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
                     }
                     return (
                       layerCursor == i && frame == fi ?
-                        <svg id={frame_id} key={frame_id} onClick={frame_select} strokeWidth={0.1} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="3" fill="#D9D9D9"/></svg> :
-                        <svg id={frame_id} key={frame_id} onClick={frame_select} stroke="currentColor" className="cursor-pointer mx-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2.5" stroke="white" strokeOpacity="0.6"/></svg>
+                        <svg id={frame_id} key={frame_id} onClick={frame_select} strokeWidth={0.1} stroke="currentColor" className="cursor-pointer mx-2 min-w-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="3" fill="#D9D9D9"/></svg> :
+                        <svg id={frame_id} key={frame_id} onClick={frame_select} stroke="currentColor" className="cursor-pointer mx-2 min-w-2 size-2" viewBox="0 0 6 6" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="3" cy="3" r="2.5" stroke="white" strokeOpacity="0.6"/></svg>
                     );
                   })
                 }

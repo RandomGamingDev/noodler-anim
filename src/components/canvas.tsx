@@ -1,11 +1,11 @@
 'use client'
 
 import { Dispatch, RefObject, useEffect, useRef, useState } from "react";
-import { DrawMode, Layer, Settings } from "@/shared/shared";
+import { DrawMode, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
 import p5 from "p5";
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, fps, setFps } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<Array<Layer>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, fps: number, setFps: Dispatch<number> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -26,7 +26,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
   const input_x_res: RefObject<HTMLInputElement | null> = useRef(null);
   const input_y_res: RefObject<HTMLInputElement | null> = useRef(null);
   
-  const create_project = (e: React.MouseEvent) => {
+  const create_project = () => {
     let x_res: number;
     let y_res: number;
     try {
@@ -37,7 +37,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
       alert("Invalid Resolution Entered!");
       return;
     }
-    e.currentTarget.parentElement!.remove();
+    input_x_res.current!.parentElement!.parentElement!.remove();
 
     const s = (sketch: p5) => {
       let canvas: p5.Renderer;
@@ -55,13 +55,15 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
         window.onkeydown = (e) => { pressed_keys[e.code] = true };
 
         canvas = sketch.createCanvas(x_res, y_res, sketch.WEBGL);
+        (sketch as unknown as { canvas: p5.Renderer }).canvas = canvas;
         canvas.parent(canvas_container.current!);
         canvas.style('image-rendering', 'pixelated');
         canvas.style('background-color', 'white');
 
         graphics = sketch.createGraphics(x_res, y_res);
 
-        layersRef.current!.push(new Layer(true, "Background", [sketch.createFramebuffer() as unknown as p5.Framebuffer]));
+        if (layersRef.current!.length == 0)
+          layersRef.current!.push(new Layer(true, "Background", [sketch.createFramebuffer() as unknown as p5.Framebuffer]));
         setLayers([...layersRef.current!]);
 
         { // Set canvas position
@@ -180,7 +182,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
         { // Frame
           for (const layer of layersRef.current!) {
-            if (layer.visible)
+            if (layer.visible && layer.frames[frameRef.current!])
               sketch.image(layer.frames[frameRef.current!], 0, 0, sketch.width, sketch.height);
           }
           //sketch.image(write_buf, 0, 0, sketch.width, sketch.height);
@@ -332,6 +334,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
         }
       };
     };
+
     p5sketch.current = new p5(s);
   }
 
@@ -359,7 +362,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       setDroppedFile(e.dataTransfer.files[0]); // Get the first file
-      e.dataTransfer.clearData(); // Clear drag data
+      //e.dataTransfer.clearData(); // Clear drag data
     }
   };
 
@@ -368,7 +371,23 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
     reader.onload = (event) => {
       const fileContent = event.target!.result;
-      console.log(fileContent);
+      const fileJSON = JSON.parse(fileContent! as unknown as string);
+      try {
+        const save = fileJSON as unknown as Save;
+        input_x_res.current!.value = String(save.res[0]);
+        input_y_res.current!.value = String(save.res[1]);
+        create_project();
+        setFps(save.fps);
+        const saveLayers: Array<Layer> = new Array(save.layers.length);
+        for (let i = 0; i < saveLayers.length; i++) {
+          saveLayers[i] = SerializedLayer.deserialize(save.layers[i], p5sketch.current!, setLayers);
+        }
+        setLayers(saveLayers);
+      }
+      catch (e) {
+        console.log("Invalid save file entered!");
+        console.log(e);
+      }
     };
     reader.readAsText(droppedFile);
 
