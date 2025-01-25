@@ -3,6 +3,7 @@ import p5 from "p5";
 import { Dispatch, RefObject } from "react";
 import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
+import { create_project, input_x_res, input_y_res } from "./canvas";
 
 export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings> }) {
   const clear = () => {
@@ -13,12 +14,15 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
   }
 
   const create_details = (
-    <div className="text-left">
-      <table>
-        <thead></thead>
-        <tbody>
-        </tbody>
-      </table>
+    <div className="text-left pt-4">
+      <div>
+        <button onClick={create_project} className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 mb-1 rounded">Create Project:</button>
+        <div className="flex">
+          <input id="create-project-res-x" ref={input_x_res} type="number" defaultValue="1920" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 mx-1 my-[0.1rem] max-w-12 max-h-5 rounded-md"></input>
+          <p>x</p>
+          <input id="create-project-res-y" ref={input_y_res} type="number" defaultValue="1080" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 mx-1 my-[0.1rem] max-w-12 max-h-5 rounded-md"></input>
+        </div>
+      </div>
     </div>
   );
 

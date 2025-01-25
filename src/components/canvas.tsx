@@ -5,6 +5,10 @@ import { DrawMode, Layer, Save, SerializedLayer, Settings } from "@/shared/share
 import FloodFill from 'q-floodfill';
 import p5 from "p5";
 
+export let input_x_res: RefObject<HTMLInputElement | null>;
+export let input_y_res: RefObject<HTMLInputElement | null>;
+export let create_project: () => void;
+
 export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
@@ -23,10 +27,10 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     playingRef.current = playing;
   });
 
-  const input_x_res: RefObject<HTMLInputElement | null> = useRef(null);
-  const input_y_res: RefObject<HTMLInputElement | null> = useRef(null);
+  input_x_res = useRef(null);
+  input_y_res = useRef(null);
   
-  const create_project = () => {
+  create_project = () => {
     let x_res: number;
     let y_res: number;
     try {
@@ -417,13 +421,16 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             <div><p>Place your project...</p></div> :
             null
         }
+      </div>
+    </div>
+  );
+
+  /*
         <button onClick={create_project} className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 mb-1 rounded">Create Project:</button>
         <div className="flex mx-4">
           <input id="create-project-res-x" ref={input_x_res} type="number" defaultValue="1920" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 mx-1 my-[0.1rem] max-w-12 max-h-5 rounded-md"></input>
           <p>x</p>
           <input id="create-project-res-y" ref={input_y_res} type="number" defaultValue="1080" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 mx-1 my-[0.1rem] max-w-12 max-h-5 rounded-md"></input>
         </div>
-      </div>
-    </div>
-  );
+        */
 }
