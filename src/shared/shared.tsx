@@ -69,8 +69,6 @@ export class Layer {
       p5sketch.clear();
       p5sketch.image(frame, 0, 0, p5sketch.width, p5sketch.height);
       serialized_frames.push(((p5sketch as unknown as { canvas: p5.Renderer }).canvas.elt as HTMLCanvasElement).toDataURL());
-      //(frame as unknown as { loadPixels: () => void }).loadPixels();
-      //serialized_frames.push(await bufferToBase64(frame.pixels as unknown as Uint8Array));
     }
 
     return new SerializedLayer(this.visible, this.name, serialized_frames);
@@ -92,10 +90,6 @@ export class SerializedLayer {
     const deserializedFrames: Array<Framebuffer> = new Array(thi.frames.length);
     const returnLayer = new Layer(thi.visible, thi.name, deserializedFrames);
     for (let i = 0; i < thi.frames.length; i++) {
-      /*
-      const layerImg = new Image();
-      layerImg.src = `data:image/png;base64,${this.frames[i]}`;
-      */
       p5sketch.loadImage(thi.frames[i], (img) => {
         const layerFB = p5sketch.createFramebuffer() as unknown as p5.Framebuffer;
         layerFB.begin();
@@ -104,12 +98,6 @@ export class SerializedLayer {
         deserializedFrames[i] = layerFB;
         setLayers(prevLayers => [...prevLayers]);
       });
-      /*
-      const layerFB = p5sketch.createFramebuffer() as unknown as p5.Framebuffer;
-      layerFB.begin();
-      p5sketch.image(layerImg, -p5sketch.width / 2, -p5sketch.height / 2);
-      layerFB.end();
-      */
     }
 
     return returnLayer;
