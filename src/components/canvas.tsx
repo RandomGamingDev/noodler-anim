@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, updateUndo } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, updateUndo: () => void }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -168,6 +168,12 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
           case "Slash": // Play/Pause
             event.preventDefault();
             setPlaying(!playingRef.current!);
+            break;
+          case "ControlLeft":
+          case "KeyZ":
+            if (!pressed_keys["ControlLeft"] && !pressed_keys["KeyZ"])
+              break;
+            console.log("undo!");
             break;
         }
       }
@@ -341,6 +347,11 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
     p5sketch.current = new p5(s);
   }
+
+  setInterval(() => {
+    updateUndo();
+  }, 1000);
+
 
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);

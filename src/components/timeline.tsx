@@ -46,12 +46,17 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
           <p>Frame</p>
           <DraggableInput value={frame} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
             const numFrames = getNumFrames();
-            console.log(numFrames);
-            setFrame(wrapmod(Number(e.currentTarget.value), numFrames));
+            try {
+              setFrame(wrapmod(Number(e.currentTarget.value), numFrames));
+            }
+            catch {}
           }}></DraggableInput>
           <p>FPS</p>
           <DraggableInput value={fps} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
-            setFps(Number(e.currentTarget.value))
+            try {
+              setFps(Number(e.currentTarget.value))
+            }
+            catch {}
           }}></DraggableInput>
           <p>Length</p>
           <DraggableInput value={getNumFrames()} className="text-center appearance-none bg-transparent border border-gray-700 ml-1 mr-4 my-[0.1rem] max-w-10 max-h-5 rounded-md" onChange={(e) => {
@@ -73,7 +78,14 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
             setLayers([...layers]);
             */
             setLayers((prevLayers) => {
-              const newNumFrames = Number(e.currentTarget.value);
+              let newNumFrames;
+              try {
+                newNumFrames = Number(e.target.value);
+              }
+              catch (e) {
+                console.log(e);
+                return prevLayers;
+              }
               const frameDif = newNumFrames - getNumFrames();
               if (frameDif >= 0) {
                 for (let i = 0; i < frameDif; i++)
