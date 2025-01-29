@@ -348,10 +348,11 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     p5sketch.current = new p5(s);
   }
 
+  /*
   setInterval(() => {
     updateUndo();
   }, 1000);
-
+  */
 
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
