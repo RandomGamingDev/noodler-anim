@@ -140,7 +140,7 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
 
   const download_details = (
     <div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={download_save}>Download</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={download_save}>Save</button>
     </div>
   );
 
@@ -151,27 +151,6 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     );
     CanvasCapture.beginVideoRecord({ format: CanvasCapture.WEBM, fps: fps });
     const num_frames = getNumFrames();
-    /*
-    let i = 0;
-    const render_frame = () => {
-      p5sketch.current!.clear();
-      for (const layer of layers) {
-        if (layer.visible)
-          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
-      }
-      CanvasCapture.recordFrame();
-
-      if (i < num_frames) {
-        i++;
-        console.log(i);
-        requestAnimationFrame(render_frame);
-      }
-      else {
-        CanvasCapture.stopRecord();
-      }
-    }
-    requestAnimationFrame(render_frame);
-    */
     for (let i = 0; i < num_frames; i++) {
       p5sketch.current!.clear();
       for (const layer of layers) {

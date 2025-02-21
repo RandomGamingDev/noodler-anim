@@ -59,6 +59,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
         window.onkeydown = (e) => { pressed_keys[e.code] = true };
 
         canvas = sketch.createCanvas(x_res, y_res, sketch.WEBGL);
+        sketch.pixelDensity(1);
         (sketch as unknown as { canvas: p5.Renderer }).canvas = canvas;
         canvas.parent(canvas_container.current!);
         canvas.style('image-rendering', 'pixelated');
@@ -292,7 +293,10 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               {
                 graphics.clear();
                 (write_buf as unknown as { loadPixels: () => void }).loadPixels();
-                const img = new ImageData(new Uint8ClampedArray(write_buf.pixels), sketch.width, sketch.height);
+                console.log(sketch.width, sketch.height);
+                console.log((write_buf as unknown as { width: number }).width, (write_buf as unknown as { height: number }).height);
+                console.log(write_buf.pixels.length);
+                const img = new ImageData(new Uint8ClampedArray(write_buf.pixels), (write_buf as unknown as { width: number }).width, (write_buf as unknown as { height: number }).height);
                 const flood_fill = new FloodFill(img);
                 flood_fill.fill(settingsRef.current!.fill_color, Math.floor(sketch.mouseX), Math.floor(sketch.mouseY), settingsRef.current!.fill_threshold);
                 sketch.clear();
@@ -348,6 +352,9 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     p5sketch.current = new p5(s);
   }
 
+  if (false) {
+    updateUndo();
+  }
   /*
   setInterval(() => {
     updateUndo();

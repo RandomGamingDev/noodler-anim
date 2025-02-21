@@ -21,8 +21,8 @@ export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode) => v
   const eraser_mode = () => {
     set_mode(DrawMode.Eraser);
   };
-  const download_mode = () => {
-    set_mode(DrawMode.Download);
+  const save_mode = () => {
+    set_mode(DrawMode.Save);
   };
   const export_mode = () => {
     set_mode(DrawMode.Export);
@@ -71,9 +71,9 @@ export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode) => v
         </div>
       </div>
       <div className="flex group">
-        <svg id="download" onClick={download_mode} viewBox="0 0 22 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M4.78316 2.14697H8.31316V6.43689H13.6911V2.14697H17.2168V6.43689V15.5786H13.6911H8.31316H4.78316V6.43689V2.14697Z" /></svg>
+        <svg id="save" onClick={save_mode} viewBox="0 0 22 19" strokeWidth={0} stroke="currentColor" fill="currentColor" className="my-4 size-6 cursor-pointer" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M4.78316 2.14697H8.31316V6.43689H13.6911V2.14697H17.2168V6.43689V15.5786H13.6911H8.31316H4.78316V6.43689V2.14697Z" /></svg>
         <div className="fixed align-middle rounded-md ml-[3rem] mt-1 hidden group-hover:block bg-gray-800 border border-gray-700">
-          <p className="p-3">{DrawModeName(DrawMode.Download)}</p>
+          <p className="p-3">{DrawModeName(DrawMode.Save)}</p>
         </div>
       </div>
       <div className="flex group">

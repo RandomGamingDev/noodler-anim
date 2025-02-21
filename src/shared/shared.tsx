@@ -9,7 +9,7 @@ export enum DrawMode {
   PixelBrush,
   Fill,
   Eraser,
-  Download,
+  Save,
   Export,
   Information
 }
@@ -30,8 +30,8 @@ export function DrawModeName(draw_mode: DrawMode) {
       return "Fill";
     case DrawMode.Eraser:
       return "Eraser";
-    case DrawMode.Download:
-      return "Download";
+    case DrawMode.Save:
+      return "Save";
     case DrawMode.Export:
       return "Export";
     case DrawMode.Information:
