@@ -254,15 +254,19 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               sketch.circle(sketch.mouseX, sketch.mouseY, settingsRef.current!.brush_radius);
 
               // Draw
-              if (mouse_was_pressed && sketch.mouseIsPressed) {
-                write_buf.begin();
-                sketch.translate(-sketch.width / 2, -sketch.height / 2);
-                {
-                  sketch.stroke(settingsRef.current!.brush_color);
-                  sketch.strokeWeight(settingsRef.current!.brush_radius);
-                  sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+              if (sketch.mouseIsPressed) {
+                if (mouse_was_pressed) {
+                  write_buf.begin();
+                  sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                  {
+                    sketch.stroke(settingsRef.current!.brush_color);
+                    sketch.strokeWeight(settingsRef.current!.brush_radius);
+                    sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+                  }
+                  write_buf.end();
                 }
-                write_buf.end();
+                else
+                  updateUndo();
               }
             }
             sketch.pop();
@@ -276,26 +280,29 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
 
               // Draw
-              if (mouse_was_pressed && sketch.mouseIsPressed) {
-                write_buf.begin();
-                sketch.translate(-sketch.width / 2, -sketch.height / 2);
-                {
-                  sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+              if (sketch.mouseIsPressed) {
+                if (mouse_was_pressed) {
+                  write_buf.begin();
+                  sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                  {
+                    sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+                  }
+                  write_buf.end();
                 }
-                write_buf.end();
+                else
+                  updateUndo();
               }
             }
             sketch.pop();
             break;
           case DrawMode.Fill:
             if (sketch.mouseIsPressed && sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width) {
+              if (!mouse_was_pressed)
+                updateUndo();
               write_buf.begin(); // Fix this and then the rest os just timeline pixel tool and hooking up settings
               {
                 graphics.clear();
                 (write_buf as unknown as { loadPixels: () => void }).loadPixels();
-                console.log(sketch.width, sketch.height);
-                console.log((write_buf as unknown as { width: number }).width, (write_buf as unknown as { height: number }).height);
-                console.log(write_buf.pixels.length);
                 const img = new ImageData(new Uint8ClampedArray(write_buf.pixels), (write_buf as unknown as { width: number }).width, (write_buf as unknown as { height: number }).height);
                 const flood_fill = new FloodFill(img);
                 flood_fill.fill(settingsRef.current!.fill_color, Math.floor(sketch.mouseX), Math.floor(sketch.mouseY), settingsRef.current!.fill_threshold);
@@ -324,16 +331,20 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               sketch.circle(sketch.mouseX, sketch.mouseY, settingsRef.current!.eraser_radius);
 
               // Draw
-              if (mouse_was_pressed && sketch.mouseIsPressed) {
-                write_buf.begin();
-                sketch.translate(-sketch.width / 2, -sketch.height / 2);
-                {
-                  sketch.erase(); // Placeholder
-                  sketch.strokeWeight(settingsRef.current!.eraser_radius);
-                  sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
-                  sketch.noErase();
+              if (sketch.mouseIsPressed) {
+                if (mouse_was_pressed) {
+                  write_buf.begin();
+                  sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                  {
+                    sketch.erase(); // Placeholder
+                    sketch.strokeWeight(settingsRef.current!.eraser_radius);
+                    sketch.line(last_mouse_pos[0], last_mouse_pos[1], sketch.mouseX, sketch.mouseY);
+                    sketch.noErase();
+                  }
+                  write_buf.end();
                 }
-                write_buf.end();
+                else
+                  updateUndo();
               }
             }
             sketch.pop();
@@ -351,15 +362,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
     p5sketch.current = new p5(s);
   }
-
-  if (false) {
-    updateUndo();
-  }
-  /*
-  setInterval(() => {
-    updateUndo();
-  }, 1000);
-  */
 
   const [droppedFile, setDroppedFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);

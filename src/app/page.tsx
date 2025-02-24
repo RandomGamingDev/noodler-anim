@@ -49,6 +49,7 @@ export default function Home() {
   const numUndos = 5;
   const [undoLayers, setUndoLayers] = useState<Layer[][]>([]);
   const updateUndo = () => {
+    console.log("Updated undo buffer!");
     const newUndoLayers = undoLayers.slice(numUndos >= undoLayers.length ? 1 : 0);
     layers.map(async (e) => SerializedLayer.deserialize(await e.serialize(p5sketch.current!), p5sketch.current!, setLayers));
     newUndoLayers.push(layers);
