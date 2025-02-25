@@ -12,7 +12,7 @@ const Details = dynamic(() => import("@/components/details"), {
 //import Details from "@/components/details";
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
-import { DrawMode, DrawModeName, Layer, SerializedLayer, Settings } from "@/shared/shared";
+import { BackupFramebuffer, DrawMode, DrawModeName, Layer, SerializedLayer, Settings } from "@/shared/shared";
 import { useRef, useState } from "react";
 import p5 from "p5";
 
@@ -47,13 +47,11 @@ export default function Home() {
   const [settings, setSettings] = useState<Settings>(new Settings());
   const [playing, setPlaying] = useState(false);
   const numUndos = 5;
-  const [undoLayers, setUndoLayers] = useState<Layer[][]>([]);
+  const [undos, setUndos] = useState<BackupFramebuffer[]>([]);
   const updateUndo = () => {
     console.log("Updated undo buffer!");
-    const newUndoLayers = undoLayers.slice(numUndos >= undoLayers.length ? 1 : 0);
-    layers.map(async (e) => SerializedLayer.deserialize(await e.serialize(p5sketch.current!), p5sketch.current!, setLayers));
-    newUndoLayers.push(layers);
-    setUndoLayers(newUndoLayers);
+    setUndos([new BackupFramebuffer(layers[layerCursor].frames[frame], layerCursor, frame), ...undos.slice(0, 31)]);
+    console.log(undos);
   }
 
   return (

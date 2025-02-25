@@ -75,6 +75,18 @@ export class Layer {
   }
 }
 
+export class BackupFramebuffer {
+  framebuffer: p5.Framebuffer
+  layer_index: Number
+  frame_index: Number
+
+  constructor(framebuffer: p5.Framebuffer, layer_index: Number, frame_index: Number) {
+    this.framebuffer = framebuffer;
+    this.layer_index = layer_index;
+    this.frame_index = frame_index;
+  }
+}
+
 export class SerializedLayer {
   visible: boolean
   name: string
