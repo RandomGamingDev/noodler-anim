@@ -162,9 +162,47 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     CanvasCapture.stopRecord();
   }
 
+  const export_gif = () => {
+    CanvasCapture.init(
+      document.getElementById("defaultCanvas0")! as HTMLCanvasElement,
+      { showRecDot: true }, // Options are optional, more info below.
+    );
+    CanvasCapture.beginGIFRecord({ fps: fps });
+    const num_frames = getNumFrames();
+    for (let i = 0; i < num_frames; i++) {
+      p5sketch.current!.clear();
+      for (const layer of layers) {
+        if (layer.visible)
+          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
+      }
+      CanvasCapture.recordFrame();
+    }
+    CanvasCapture.stopRecord();
+  }
+
+  const export_png_frames = () => {
+    CanvasCapture.init(
+      document.getElementById("defaultCanvas0")! as HTMLCanvasElement,
+      { showRecDot: true }, // Options are optional, more info below.
+    );
+    CanvasCapture.beginPNGFramesRecord({});
+    const num_frames = getNumFrames();
+    for (let i = 0; i < num_frames; i++) {
+      p5sketch.current!.clear();
+      for (const layer of layers) {
+        if (layer.visible)
+          p5sketch.current!.image(layer.frames[i], 0, 0, p5sketch.current!.width, p5sketch.current!.height);
+      }
+      CanvasCapture.recordFrame();
+    }
+    CanvasCapture.stopRecord();
+  }
+
   const export_details = (
     <div>
-      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_vid}>Export</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_vid}>Export Video</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_gif}>Export GIF</button>
+      <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={export_png_frames}>Export PNG Frames</button>
     </div>
   );
 

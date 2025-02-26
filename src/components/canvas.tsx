@@ -1,7 +1,7 @@
 'use client'
 
 import { Dispatch, RefObject, SetStateAction, useEffect, useRef, useState } from "react";
-import { DrawMode, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
+import { BackupFramebuffer, DrawMode, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
 import FloodFill from 'q-floodfill';
 import p5 from "p5";
 
@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, updateUndo } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, updateUndo: () => void }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -18,6 +18,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
   const frameRef = useRef(frame);
   const settingsRef = useRef(settings);
   const playingRef = useRef(playing);
+  const undosRef = useRef(undos);
   useEffect(() => {
     modeRef.current = mode;
     layersRef.current = layers;
@@ -25,6 +26,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     frameRef.current = frame;
     settingsRef.current = settings;
     playingRef.current = playing;
+    undosRef.current = undos;
   });
 
   input_x_res = useRef(null);
@@ -174,7 +176,8 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
           case "KeyZ":
             if (!pressed_keys["ControlLeft"] && !pressed_keys["KeyZ"])
               break;
-            console.log("undo!");
+            undo();
+            console.log(undosRef.current);
             break;
         }
       }
@@ -266,7 +269,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                   write_buf.end();
                 }
                 else
-                  updateUndo();
+                  updateUndo(sketch);
               }
             }
             sketch.pop();
@@ -290,7 +293,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                   write_buf.end();
                 }
                 else
-                  updateUndo();
+                  updateUndo(sketch);
               }
             }
             sketch.pop();
@@ -298,7 +301,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
           case DrawMode.Fill:
             if (sketch.mouseIsPressed && sketch.mouseX >= 0 && sketch.mouseX < sketch.width && sketch.mouseY >= 0 && sketch.mouseY < sketch.width) {
               if (!mouse_was_pressed)
-                updateUndo();
+                updateUndo(sketch);
               write_buf.begin(); // Fix this and then the rest os just timeline pixel tool and hooking up settings
               {
                 graphics.clear();
@@ -344,7 +347,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                   write_buf.end();
                 }
                 else
-                  updateUndo();
+                  updateUndo(sketch);
               }
             }
             sketch.pop();

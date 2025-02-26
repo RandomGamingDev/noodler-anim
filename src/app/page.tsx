@@ -12,9 +12,10 @@ const Details = dynamic(() => import("@/components/details"), {
 //import Details from "@/components/details";
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
-import { BackupFramebuffer, DrawMode, DrawModeName, Layer, SerializedLayer, Settings } from "@/shared/shared";
+import { BackupFramebuffer, DrawMode, DrawModeName, Layer, Settings } from "@/shared/shared";
 import { useRef, useState } from "react";
-import p5 from "p5";
+import p5, { Framebuffer } from "p5";
+import Sketch from "react-p5";
 
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Create);
@@ -48,17 +49,27 @@ export default function Home() {
   const [playing, setPlaying] = useState(false);
   const numUndos = 5;
   const [undos, setUndos] = useState<BackupFramebuffer[]>([]);
-  const updateUndo = () => {
-    console.log("Updated undo buffer!");
-    setUndos([new BackupFramebuffer(layers[layerCursor].frames[frame], layerCursor, frame), ...undos.slice(0, 31)]);
-    console.log(undos);
+  const copyFramebuffer = (sketch: p5, frameBuffer: p5.Framebuffer) => {
+    const newFramebuffer: p5.Framebuffer = sketch.createFramebuffer() as unknown as p5.Framebuffer;
+    newFramebuffer.begin();
+    sketch.image(frameBuffer, 0, 0);
+    newFramebuffer.end();
+    return newFramebuffer;
+  }
+  const updateUndo = (sketch: p5) => setUndos(prevUndos => [new BackupFramebuffer(copyFramebuffer(sketch, layers[layerCursor].frames[frame]), layerCursor, frame), ...prevUndos.slice(0, numUndos - 1)]);
+  const undo = () => {
+    if (undos.length < 1)
+      return;
+    const undoFramebuffer = undos[0];
+    layers[undoFramebuffer.layer_index].frames[undoFramebuffer.frame_index] = undoFramebuffer.framebuffer;
+    setUndos(prevUndos => prevUndos.slice(1));
   }
 
   return (
     <div className="max-w-full flex">
       <Sidebar set_mode={set_mode}></Sidebar>
       <div className="max-w-full w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} updateUndo={updateUndo}></Canvas>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
       <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings}></Details>
