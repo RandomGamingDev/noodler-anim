@@ -177,7 +177,6 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             if (!pressed_keys["ControlLeft"] && !pressed_keys["KeyZ"])
               break;
             undo();
-            console.log(undosRef.current);
             break;
         }
       }

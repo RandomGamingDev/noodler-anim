@@ -52,17 +52,24 @@ export default function Home() {
   const copyFramebuffer = (sketch: p5, frameBuffer: p5.Framebuffer) => {
     const newFramebuffer: p5.Framebuffer = sketch.createFramebuffer() as unknown as p5.Framebuffer;
     newFramebuffer.begin();
-    sketch.image(frameBuffer, 0, 0);
+    sketch.image(frameBuffer, -sketch.width / 2, -sketch.height / 2);
     newFramebuffer.end();
     return newFramebuffer;
   }
   const updateUndo = (sketch: p5) => setUndos(prevUndos => [new BackupFramebuffer(copyFramebuffer(sketch, layers[layerCursor].frames[frame]), layerCursor, frame), ...prevUndos.slice(0, numUndos - 1)]);
   const undo = () => {
-    if (undos.length < 1)
-      return;
-    const undoFramebuffer = undos[0];
-    layers[undoFramebuffer.layer_index].frames[undoFramebuffer.frame_index] = undoFramebuffer.framebuffer;
-    setUndos(prevUndos => prevUndos.slice(1));
+    setUndos(prevUndos => {
+      if (prevUndos.length < 1)
+        return prevUndos;
+
+      const undoFramebuffer = prevUndos[0];
+      setLayers(prevLayers => {
+        prevLayers[undoFramebuffer.layer_index].frames[undoFramebuffer.frame_index] = undoFramebuffer.framebuffer
+        return [...prevLayers];
+      });
+
+      return prevUndos.slice(1);
+    });
   }
 
   return (
