@@ -14,8 +14,7 @@ import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
 import { BackupFramebuffer, DrawMode, DrawModeName, Layer, Settings } from "@/shared/shared";
 import { useRef, useState } from "react";
-import p5, { Framebuffer } from "p5";
-import Sketch from "react-p5";
+import p5 from "p5";
 
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Create);
@@ -64,7 +63,10 @@ export default function Home() {
 
       const undoFramebuffer = prevUndos[0];
       setLayers(prevLayers => {
-        prevLayers[undoFramebuffer.layer_index].frames[undoFramebuffer.frame_index] = undoFramebuffer.framebuffer
+        try {
+          prevLayers[undoFramebuffer.layer_index].frames[undoFramebuffer.frame_index] = undoFramebuffer.framebuffer
+        }
+        catch {}
         return [...prevLayers];
       });
 
