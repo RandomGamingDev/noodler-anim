@@ -42,7 +42,7 @@ export default function Home() {
   const get_num_frames = () => layers.length > 0 ? layers[0].frames.length : 0;
   const [layerCursor, setLayerCursor] = useState<number>(0);
   const [frame, setFrame] = useState<number>(0);
-  const [fps, setFps] = useState<number>(60);
+  const [fps, setFps] = useState<number>(18);
   const p5sketch = useRef<p5>(null);
   const [settings, setSettings] = useState<Settings>(new Settings());
   const [playing, setPlaying] = useState(false);
@@ -73,15 +73,17 @@ export default function Home() {
       return prevUndos.slice(1);
     });
   }
+  const [customBrushes, setCustomBrushes] = useState<Blob[]>([]);
+  const [currentBrush, setCurrentBrush] = useState<number>(0);
 
   return (
     <div className="max-w-full flex">
       <Sidebar set_mode={set_mode}></Sidebar>
       <div className="max-w-full w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo}></Canvas>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
-      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings}></Details>
+      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
     </div>
   );
 }

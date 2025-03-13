@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: Blob[], setCustomBrushes: Dispatch<Blob[]>, currentBrush: number }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -235,6 +235,15 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               copied.toBlob(function(blob) { 
                 const item = new ClipboardItem({ "image/png": blob! });
                 navigator.clipboard.write([item]); 
+
+                /* Get URL
+                const reader = new FileReader();
+                reader.onload = function() {
+                  console.log(reader.result);
+                }
+                reader.readAsDataURL(blob!);
+                */
+                setCustomBrushes([blob!, ...customBrushes]);
               });
             }
             break;
