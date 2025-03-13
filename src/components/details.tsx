@@ -86,21 +86,24 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
             </th>
           </tr>
           <tr>
-            <h1 className="font-bold pt-5">Brushes:</h1>
+            <p className="font-bold pt-5">Brushes:</p>
             {
-              customBrushes.map((e, i) => {
+              customBrushes.map(async (e, i) => {
+                return <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg"></img>;
+                /*
                 const [customBrush, setCustomBrush] = useState<string>("");
 
                 const reader = new FileReader();
                 reader.onload = function() {
                   console.log(reader.result);
-                  setCustomBrush(reader.result);
+                  setCustomBrush(reader.result! as string);
                 }
                 reader.readAsDataURL(e!);
 
                 return (
                   <img key={`custom-brush-${i}`} src={customBrush}></img>
                 );
+                */
               })
             }
           </tr>

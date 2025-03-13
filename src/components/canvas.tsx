@@ -243,6 +243,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                 }
                 reader.readAsDataURL(blob!);
                 */
+
                 setCustomBrushes([blob!, ...customBrushes]);
               });
             }
