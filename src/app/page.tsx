@@ -73,7 +73,7 @@ export default function Home() {
       return prevUndos.slice(1);
     });
   }
-  const [customBrushes, setCustomBrushes] = useState<Blob[]>([]);
+  const [customBrushes, setCustomBrushes] = useState<string[]>([]);
   const [currentBrush, setCurrentBrush] = useState<number>(0);
 
   return (

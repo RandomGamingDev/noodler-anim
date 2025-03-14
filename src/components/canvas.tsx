@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: Blob[], setCustomBrushes: Dispatch<Blob[]>, currentBrush: number }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: string[], setCustomBrushes: Dispatch<SetStateAction<string[]>>, currentBrush: number }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -222,12 +222,23 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             }
             else if (mouse_was_pressed) {
               const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
-              const copied_img = sketch.get(
-                mouse_pressed_loc[0],
-                mouse_pressed_loc[1],
-                sketch.mouseX - selection_org[0],
-                sketch.mouseY - selection_org[1]
-              );
+              const bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX - selection_org[0], sketch.mouseX - selection_org[1]];
+              bounds[0] = Math.max(Math.min(bounds[0], sketch.width), 0);
+              bounds[2] = Math.max(Math.min(bounds[2], sketch.width), 0);
+              bounds[1] = Math.max(Math.min(bounds[1], sketch.height), 0);
+              bounds[3] = Math.max(Math.min(bounds[3], sketch.height), 0);
+              if (bounds[0] > bounds[2]) {
+                const temp = bounds[0];
+                bounds[0] = bounds[1];
+                bounds[1] = temp;
+              }
+              if (bounds[1] > bounds[3]) {
+                const temp = bounds[1];
+                bounds[1] = bounds[3];
+                bounds[3] = temp;
+              }
+
+              const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
               const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
 
               local_clipboard = copied_img;
@@ -236,15 +247,13 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                 const item = new ClipboardItem({ "image/png": blob! });
                 navigator.clipboard.write([item]); 
 
-                /* Get URL
                 const reader = new FileReader();
                 reader.onload = function() {
                   console.log(reader.result);
+                  setCustomBrushes(prevCustomBrushes => [reader.result! as string, ...prevCustomBrushes]);
                 }
-                reader.readAsDataURL(blob!);
-                */
-
-                setCustomBrushes([blob!, ...customBrushes]);
+                if (blob != null)
+                  reader.readAsDataURL(blob!);
               });
             }
             break;

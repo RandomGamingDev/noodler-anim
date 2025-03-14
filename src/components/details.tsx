@@ -5,7 +5,7 @@ import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: Blob[], setCustomBrushes: Dispatch<Blob[]>, currentBrush: number, setCurrentBrush: Dispatch<number> }) {
+export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: string[], setCustomBrushes: Dispatch<string[]>, currentBrush: number, setCurrentBrush: Dispatch<number> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
     current_frame.begin();
@@ -86,24 +86,18 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
             </th>
           </tr>
           <tr>
-            <p className="font-bold pt-5">Brushes:</p>
+            <p className="w-full font-bold pt-5">Brushes:</p>
             {
               customBrushes.map(async (e, i) => {
-                return <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/Banana-Single.jpg/2324px-Banana-Single.jpg"></img>;
-                /*
-                const [customBrush, setCustomBrush] = useState<string>("");
-
-                const reader = new FileReader();
-                reader.onload = function() {
-                  console.log(reader.result);
-                  setCustomBrush(reader.result! as string);
+                const setBrush = () => {
+                  setCurrentBrush(i)
                 }
-                reader.readAsDataURL(e!);
 
                 return (
-                  <img key={`custom-brush-${i}`} src={customBrush}></img>
+                  <div className="w-full my-5 border" key={`custom-brush-${i}`}>
+                    <img className="cursor-pointer" alt={`custom-brush-img-${i}`} onClick={setBrush} src={e}></img>
+                  </div>
                 );
-                */
               })
             }
           </tr>
