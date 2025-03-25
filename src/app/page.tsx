@@ -73,7 +73,7 @@ export default function Home() {
       return prevUndos.slice(1);
     });
   }
-  const [customBrushes, setCustomBrushes] = useState<string[]>([]);
+  const [customBrushes, setCustomBrushes] = useState<[p5.Image, string][]>([]);
   const [currentBrush, setCurrentBrush] = useState<number>(0);
 
   return (
@@ -83,7 +83,7 @@ export default function Home() {
         <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
-      <Details mode={mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
+      <Details mode={mode} setMode={set_mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
     </div>
   );
 }

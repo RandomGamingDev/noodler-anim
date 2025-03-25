@@ -1,11 +1,11 @@
 import { download_file, DrawMode, DrawModeName, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
 import p5 from "p5";
-import { Dispatch, RefObject, useState } from "react";
+import { Dispatch, RefObject, SetStateAction } from "react";
 import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: string[], setCustomBrushes: Dispatch<string[]>, currentBrush: number, setCurrentBrush: Dispatch<number> }) {
+export default function Details({ mode, setMode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<number> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
     current_frame.begin();
@@ -71,6 +71,9 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
     </div>
   );
 
+  const addBrush = () => {
+    setMode(DrawMode.Select);
+  }
   const pixelbrush_details = (
     <div className="text-left">
       <table>
@@ -86,20 +89,31 @@ export default function Details({ mode, layers, layerCursor, frame, fps, getNumF
             </th>
           </tr>
           <tr>
-            <p className="w-full font-bold pt-5">Brushes:</p>
-            {
-              customBrushes.map(async (e, i) => {
-                const setBrush = () => {
-                  setCurrentBrush(i)
-                }
+            <th>
+              <p className="w-full font-bold pt-5">Brushes:</p>
+              {
+                customBrushes.map((e, i) => {
+                  const setBrush = () => {
+                    setCurrentBrush(i);
+                  }
+                  const remBrush = () => {
+                    setCustomBrushes((prevCustomBrushes: [p5.Image, string][]) => [...prevCustomBrushes.slice(0, i), ...prevCustomBrushes.slice(i + 1)]);
+                  }
 
-                return (
-                  <div className="w-full my-5 border" key={`custom-brush-${i}`}>
-                    <img className="cursor-pointer" alt={`custom-brush-img-${i}`} onClick={setBrush} src={e}></img>
-                  </div>
-                );
-              })
-            }
+                  return (
+                    <div className="w-full my-5 border" key={`custom-brush-${i}`}>
+                      <img className={`cursor-pointer ${currentBrush == i ? "bg-white-100" : null}`} alt={`custom-brush-img-${i}`} onClick={setBrush} src={e[1]}></img>
+                      <button onClick={remBrush} className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-md transition-all" aria-label="Delete">
+                        X
+                      </button>
+                    </div>
+                  );
+                })
+              }
+              <button onClick={addBrush} className="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md transition-all" aria-label="Create">
+                +
+              </button>
+            </th>
           </tr>
         </tbody>
       </table>

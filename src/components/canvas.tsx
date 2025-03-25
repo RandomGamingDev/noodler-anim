@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: string[], setCustomBrushes: Dispatch<SetStateAction<string[]>>, currentBrush: number }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -19,6 +19,8 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
   const settingsRef = useRef(settings);
   const playingRef = useRef(playing);
   const undosRef = useRef(undos);
+  const customBrushesRef = useRef(customBrushes);
+  const currentBrushRef = useRef(currentBrush);
   useEffect(() => {
     modeRef.current = mode;
     layersRef.current = layers;
@@ -27,6 +29,8 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     settingsRef.current = settings;
     playingRef.current = playing;
     undosRef.current = undos;
+    customBrushesRef.current = customBrushes;
+    currentBrushRef.current = currentBrush;
   });
 
   input_x_res = useRef(null);
@@ -221,22 +225,29 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               sketch.pop();
             }
             else if (mouse_was_pressed) {
-              const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
-              const bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX - selection_org[0], sketch.mouseX - selection_org[1]];
-              bounds[0] = Math.max(Math.min(bounds[0], sketch.width), 0);
-              bounds[2] = Math.max(Math.min(bounds[2], sketch.width), 0);
-              bounds[1] = Math.max(Math.min(bounds[1], sketch.height), 0);
-              bounds[3] = Math.max(Math.min(bounds[3], sketch.height), 0);
+              const bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX, sketch.mouseY];
               if (bounds[0] > bounds[2]) {
                 const temp = bounds[0];
-                bounds[0] = bounds[1];
-                bounds[1] = temp;
+                bounds[0] = bounds[2];
+                bounds[2] = temp;
               }
               if (bounds[1] > bounds[3]) {
                 const temp = bounds[1];
                 bounds[1] = bounds[3];
                 bounds[3] = temp;
               }
+              {
+                bounds[0] = Math.max(Math.min(bounds[0], sketch.width), 0);
+                bounds[2] = Math.max(Math.min(bounds[2], sketch.width), 0);
+                bounds[1] = Math.max(Math.min(bounds[1], sketch.height), 0);
+                bounds[3] = Math.max(Math.min(bounds[3], sketch.height), 0);
+              }
+              {
+                bounds[2] -= bounds[0];
+                bounds[3] -= bounds[1];
+              }
+              if (bounds[2] == 0 || bounds[3] == 0)
+                break;
 
               const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
               const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
@@ -249,8 +260,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
                 const reader = new FileReader();
                 reader.onload = function() {
-                  console.log(reader.result);
-                  setCustomBrushes(prevCustomBrushes => [reader.result! as string, ...prevCustomBrushes]);
+                  setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
                 }
                 if (blob != null)
                   reader.readAsDataURL(blob!);
@@ -298,7 +308,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             sketch.push();
             {
               // Draw cursor
-              sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+              sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
 
               // Draw
               if (sketch.mouseIsPressed) {
@@ -306,7 +316,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                   write_buf.begin();
                   sketch.translate(-sketch.width / 2, -sketch.height / 2);
                   {
-                    sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+                    sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
                   }
                   write_buf.end();
                 }
