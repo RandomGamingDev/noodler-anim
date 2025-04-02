@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -275,6 +275,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
 
                   const reader = new FileReader();
                   reader.onload = function() {
+                    setCurrentBrush(prevCurrentBrush => currentBrush == -1 ? 0 : prevCurrentBrush);
                     setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
                   }
                   if (blob != null)
@@ -319,7 +320,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             sketch.pop();
             break;
           case DrawMode.PixelBrush:
-            if (local_clipboard == undefined)
+            if (local_clipboard == undefined || currentBrushRef.current! == -1)
               break;
             sketch.push();
             {

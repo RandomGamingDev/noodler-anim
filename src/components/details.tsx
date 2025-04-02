@@ -5,7 +5,7 @@ import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, setMode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<number> }) {
+export default function Details({ mode, setMode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
   const clear = () => {
     const current_frame = layers[layerCursor].frames[frame];
     current_frame.begin();
@@ -97,7 +97,10 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
                     setCurrentBrush(i);
                   }
                   const remBrush = () => {
-                    setCustomBrushes((prevCustomBrushes: [p5.Image, string][]) => [...prevCustomBrushes.slice(0, i), ...prevCustomBrushes.slice(i + 1)]);
+                    setCustomBrushes((prevCustomBrushes: [p5.Image, string][]) => {
+                      setCurrentBrush(prevCurrentBrush => prevCurrentBrush == prevCustomBrushes.length - 1 ? prevCurrentBrush - 1 : prevCurrentBrush);
+                      return [...prevCustomBrushes.slice(0, i), ...prevCustomBrushes.slice(i + 1)];
+                    });
                   }
 
                   return (
