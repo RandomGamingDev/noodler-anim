@@ -138,10 +138,12 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
         canvas.style('height', `${canvas_dims[1] + coord_dif[1]}px`);
       }
 
+      let mouse_pressed_event: MouseEvent | null = null;
       const mouse_pressed_loc = [0, 0];
-      sketch.mousePressed = () => {
+      sketch.mousePressed = (e: MouseEvent) => {
         mouse_pressed_loc[0] = sketch.mouseX;
         mouse_pressed_loc[1] = sketch.mouseY;
+        mouse_pressed_event = e;
       }
 
       /*
@@ -249,22 +251,36 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               if (bounds[2] == 0 || bounds[3] == 0)
                 break;
 
-              const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
-              const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
-
-              local_clipboard = copied_img;
-
-              copied.toBlob(function(blob) { 
-                const item = new ClipboardItem({ "image/png": blob! });
-                navigator.clipboard.write([item]); 
-
-                const reader = new FileReader();
-                reader.onload = function() {
-                  setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
+              if (mouse_pressed_event?.button == 2) {
+                write_buf.begin();
+                sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                sketch.push();
+                {
+                  sketch.noStroke();
+                  sketch.fill(255, 255, 255);
+                  sketch.rect(bounds[0], bounds[1], bounds[2], bounds[3]);
                 }
-                if (blob != null)
-                  reader.readAsDataURL(blob!);
-              });
+                sketch.pop();
+                write_buf.end();
+              }
+              else {
+                const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
+                const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
+
+                local_clipboard = copied_img;
+
+                copied.toBlob(function(blob) { 
+                  const item = new ClipboardItem({ "image/png": blob! });
+                  navigator.clipboard.write([item]); 
+
+                  const reader = new FileReader();
+                  reader.onload = function() {
+                    setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
+                  }
+                  if (blob != null)
+                    reader.readAsDataURL(blob!);
+                });
+              }
             }
             break;
           case DrawMode.Brush:
