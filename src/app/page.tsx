@@ -76,6 +76,10 @@ export default function Home() {
   const [customBrushes, setCustomBrushes] = useState<[p5.Image, string][]>([]);
   const [currentBrush, setCurrentBrush] = useState<number>(0);
 
+  document.addEventListener("contextmenu", function(event) {
+    event.preventDefault();
+  });
+
   return (
     <div className="max-w-full flex">
       <Sidebar set_mode={set_mode}></Sidebar>
