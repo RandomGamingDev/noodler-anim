@@ -13,7 +13,7 @@ const Details = dynamic(() => import("@/components/details"), {
 import Sidebar from "@/components/sidebar";
 import Timeline from "@/components/timeline";
 import { BackupFramebuffer, DrawMode, DrawModeName, Layer, Settings } from "@/shared/shared";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import p5 from "p5";
 
 export default function Home() {
@@ -76,8 +76,10 @@ export default function Home() {
   const [customBrushes, setCustomBrushes] = useState<[p5.Image, string][]>([]);
   const [currentBrush, setCurrentBrush] = useState<number>(-1);
 
-  document.addEventListener("contextmenu", function(event) {
-    event.preventDefault();
+  useEffect(() => {
+    document.addEventListener("contextmenu", function(event) {
+      event.preventDefault();
+    });
   });
 
   return (
