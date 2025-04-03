@@ -104,8 +104,8 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
                   }
 
                   return (
-                    <div className="w-full my-5 border" key={`custom-brush-${i}`}>
-                      <img className={`cursor-pointer ${currentBrush == i ? "bg-white-100" : null}`} alt={`custom-brush-img-${i}`} onClick={setBrush} src={e[1]}></img>
+                    <div className="w-full my-5 rounded-lg border" key={`custom-brush-${i}`}>
+                      <img className={`w-full max-w-full h-full max-h-full cursor-pointer ${currentBrush == i ? "bg-white-100" : null}`} alt={`custom-brush-img-${i}`} onClick={setBrush} src={e[1]}></img>
                       <button onClick={remBrush} className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-md transition-all" aria-label="Delete">
                         X
                       </button>
