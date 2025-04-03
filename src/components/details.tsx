@@ -13,10 +13,14 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
     current_frame.end();
   }
 
+  const create = () => {
+    setMode(DrawMode.Information);
+    create_project();
+  }
   const create_details = (
     <div className="text-left pt-4">
       <div>
-        <button onClick={create_project} className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 mb-1 rounded">Create Project:</button>
+        <button onClick={create} className="bg-blue-500 hover:bg-blue-700 text-white font-bold p-1 mb-1 rounded">Create Project:</button>
         <div className="flex">
           <input id="create-project-res-x" ref={input_x_res} type="number" defaultValue="1080" pattern="[0-9]" className="text-center appearance-none bg-transparent border border-gray-700 mx-1 my-[0.1rem] max-w-12 max-h-5 rounded-md"></input>
           <p>x</p>
