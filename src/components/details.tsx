@@ -1,18 +1,11 @@
-import { download_file, DrawMode, DrawModeName, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
+import { download_file, DrawMode, Layer, Save, SerializedLayer, Settings } from "@/shared/shared";
 import p5 from "p5";
 import { Dispatch, RefObject, SetStateAction } from "react";
 import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, setMode, layers, layerCursor, frame, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, layerCursor: number, frame: number, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
-  const clear = () => {
-    const current_frame = layers[layerCursor].frames[frame];
-    current_frame.begin();
-    p5sketch.current!.clear();
-    current_frame.end();
-  }
-
+export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
   const create = () => {
     setMode(DrawMode.Information);
     create_project();
@@ -30,34 +23,21 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
     </div>
   );
 
-  const clear_details = (
-    <div className="text-left">
-      <table>
-        <thead></thead>
-        <tbody>
-        </tbody>
-      </table>
-      <button onClick={clear} className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Clear</button>
-    </div>
-  );
-
-  const select_details = (
-    <div>
-
-    </div>
-  );
-
+  const addBrush = () => {
+    setMode(DrawMode.Select);
+  }
   const brush_details = (
     <div className="text-left">
       <table>
         <thead></thead>
         <tbody>
           <tr>
-            <th><h2 className="font-normal p-2">Brush Color</h2></th>
+            <th><h2 className="font-normal p-2">Color</h2></th>
             <th>
               <input value={settings.brush_color} onChange={(e) => {
                 settings.brush_color = e.currentTarget.value;
-                setSettings({... settings});
+                settings.fill_color = e.currentTarget.value;
+                setSettings({ ...settings });
               }} className="m-1" type="color" />
             </th>
           </tr>
@@ -66,23 +46,18 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
             <th>
               <DraggableInput value={settings.brush_radius} className="m-1 max-w-16 text-black" onChange={(e) => {
                 settings.brush_radius = Number(e.currentTarget.value);
+                settings.eraser_radius = Number(e.currentTarget.value);
                 setSettings({... settings});
               }} />
             </th>
           </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const addBrush = () => {
-    setMode(DrawMode.Select);
-  }
-  const pixelbrush_details = (
-    <div className="text-left">
-      <table>
-        <thead></thead>
-        <tbody>
+          <tr>
+            <th><h2 className="font-normal p-2">Threshold</h2></th>
+            <th><DraggableInput value={settings.fill_threshold} onChange={(e) => {
+              settings.fill_threshold = Number(e.currentTarget.value);
+              setSettings({... settings});
+            }} className="m-1 max-w-16 text-black" /></th>
+          </tr>
           <tr>
             <th><h2 className="font-normal p-2">Brush Size</h2></th>
             <th>
@@ -93,75 +68,36 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
             </th>
           </tr>
           <tr>
-            <th>
-              <p className="w-full font-bold pt-5">Brushes:</p>
-              {
-                customBrushes.map((e, i) => {
-                  const setBrush = () => {
-                    setCurrentBrush(i);
-                  }
-                  const remBrush = () => {
-                    setCustomBrushes((prevCustomBrushes: [p5.Image, string][]) => {
-                      setCurrentBrush(prevCurrentBrush => prevCurrentBrush == prevCustomBrushes.length - 1 ? prevCurrentBrush - 1 : prevCurrentBrush);
-                      return [...prevCustomBrushes.slice(0, i), ...prevCustomBrushes.slice(i + 1)];
-                    });
-                  }
+            <th colSpan={2} className="w-full">
+              <p className="w-full font-bold py-5">Brushes:</p>
+              <div className="grid grid-cols-3 gap-4 w-full">
+                {
+                  customBrushes.map((e, i) => {
+                    const setBrush = () => {
+                      setCurrentBrush(i);
+                    }
+                    const remBrush = () => {
+                      setCustomBrushes((prevCustomBrushes: [p5.Image, string][]) => {
+                        setCurrentBrush(prevCurrentBrush => prevCurrentBrush == prevCustomBrushes.length - 1 ? prevCurrentBrush - 1 : prevCurrentBrush);
+                        return [...prevCustomBrushes.slice(0, i), ...prevCustomBrushes.slice(i + 1)];
+                      });
+                    }
 
-                  return (
-                    <div className="w-full my-5 rounded-lg border" key={`custom-brush-${i}`}>
-                      <img className={`w-full max-w-full h-full max-h-full cursor-pointer ${currentBrush == i ? "bg-white-100" : null}`} alt={`custom-brush-img-${i}`} onClick={setBrush} src={e[1]}></img>
-                      <button onClick={remBrush} className="w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-md transition-all" aria-label="Delete">
-                        X
-                      </button>
-                    </div>
-                  );
-                })
-              }
-              <button onClick={addBrush} className="w-10 h-10 flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md transition-all" aria-label="Create">
+                    return (
+                      <div className="w-full rounded-lg border relative aspect-square" key={`custom-brush-${i}`}>
+                        <img className={`w-full h-full object-contain cursor-pointer ${currentBrush == i ? "bg-white-100" : null}`} alt={`custom-brush-img-${i}`} onClick={setBrush} src={e[1]}></img>
+                        <button onClick={remBrush} className="absolute top-0 left-0 w-3 h-3 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 active:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-400 shadow-md transition-all" aria-label="Delete">
+                          X
+                        </button>
+                      </div>
+                    );
+                  })
+                }
+              </div>
+              <button onClick={addBrush} className="w-10 h-10 mt-5 flex items-center justify-center bg-green-500 text-white rounded-lg hover:bg-green-600 active:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 shadow-md transition-all" aria-label="Create">
                 +
               </button>
             </th>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const fill_details = (
-    <div className="text-left">
-      <table>
-        <thead></thead>
-        <tbody>
-          <tr>
-            <th><h2 className="font-normal p-2">Fill Color</h2></th>
-            <th><input value={settings.fill_color} onChange={(e) => {
-              settings.fill_color = e.currentTarget.value;
-              setSettings({... settings});
-            }} className="m-1" type="color" /></th>
-          </tr>
-          <tr>
-            <th><h2 className="font-normal p-2">Threshold</h2></th>
-            <th><DraggableInput value={settings.fill_threshold} onChange={(e) => {
-              settings.fill_threshold = Number(e.currentTarget.value);
-              setSettings({... settings});
-            }} className="m-1 max-w-16 text-black" /></th>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  );
-
-  const eraser_details = (
-    <div className="text-left">
-      <table>
-        <thead></thead>
-        <tbody>
-          <tr>
-            <th><h2 className="font-normal p-2">Brush Radius</h2></th>
-            <th><DraggableInput value={settings.eraser_radius} onChange={(e) => {
-              settings.eraser_radius = Number(e.currentTarget.value);
-              setSettings({... settings});
-            }} className="m-1 max-w-16 text-black" /></th>
           </tr>
         </tbody>
       </table>
@@ -283,16 +219,15 @@ export default function Details({ mode, setMode, layers, layerCursor, frame, fps
 
   return (
     <div className="min-w-64 w-64 min-h-screen max-h-screen bg-gray-800 p-2 border border-gray-700 text-gray-300 overflow-scroll">
-      <h1 className="text-xl font-bold">{ DrawModeName(mode) }</h1>
       {
         [
           create_details,
-          clear_details,
-          select_details,
           brush_details,
-          pixelbrush_details,
-          fill_details,
-          eraser_details,
+          brush_details,
+          brush_details,
+          brush_details,
+          brush_details,
+          brush_details,
           download_details,
           export_details,
           information_details

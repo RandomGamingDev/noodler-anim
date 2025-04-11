@@ -84,12 +84,12 @@ export default function Home() {
 
   return (
     <div className="max-w-full flex">
-      <Sidebar set_mode={set_mode}></Sidebar>
+      <Sidebar set_mode={set_mode} layers={layers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Sidebar>
       <div className="max-w-full w-full max-h-screen">
         <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
-      <Details mode={mode} setMode={set_mode} layers={layers} layerCursor={layerCursor} frame={frame} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
+      <Details mode={mode} setMode={set_mode} layers={layers} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
     </div>
   );
 }

@@ -1,10 +1,16 @@
 'use client'
 
-import { DrawMode, DrawModeName } from "@/shared/shared";
+import { DrawMode, DrawModeName, Layer } from "@/shared/shared";
+import p5 from "p5";
+import { RefObject } from "react";
 
-export default function Sidebar({ set_mode } : { set_mode: (mode: DrawMode) => void }) {
+export default function Sidebar({ set_mode, layers, layerCursor, frame, p5sketch } : { set_mode: (mode: DrawMode) => void, layers: Array<Layer>, layerCursor: number, frame: number, p5sketch: RefObject<p5 | null> }) {
   const clear_mode = () => {
-    set_mode(DrawMode.Clear);
+    //set_mode(DrawMode.Clear);
+    const current_frame = layers[layerCursor].frames[frame];
+    current_frame.begin();
+    p5sketch.current!.clear();
+    current_frame.end();
   };
   const select_mode = () => {
     set_mode(DrawMode.Select);
