@@ -18,10 +18,16 @@ import p5 from "p5";
 
 export default function Home() {
   const [mode, setMode] = useState(DrawMode.Create);
+  const [pselect, setPSelect] = useState(true);
   const set_mode = (mode: DrawMode) => {
     const clicked = document.getElementById(DrawModeName(mode).toLowerCase())!;
     clicked.setAttribute("stroke", "#ADD8E6");
     clicked.setAttribute("fill", "#ADD8E6");
+    switch (mode) {
+      case DrawMode.PixelBrush:
+        setPSelect(true);
+        break;
+    }
     setMode(prev_mode => {
       if (mode == prev_mode)
         return prev_mode;
@@ -75,6 +81,7 @@ export default function Home() {
   }
   const [customBrushes, setCustomBrushes] = useState<[p5.Image, string][]>([]);
   const [currentBrush, setCurrentBrush] = useState<number>(-1);
+  const [addBrush, setAddBrush] = useState<() => void>(() => console.log("I haven't been defined yet!"));
 
   useEffect(() => {
     document.addEventListener("contextmenu", function(event) {
@@ -86,10 +93,10 @@ export default function Home() {
     <div className="max-w-full flex">
       <Sidebar set_mode={set_mode} layers={layers} layerCursor={layerCursor} frame={frame} p5sketch={p5sketch}></Sidebar>
       <div className="max-w-full w-full max-h-screen">
-        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Canvas>
+        <Canvas mode={mode} layers={layers} setLayers={setLayers} layerCursor={layerCursor} frame={frame} setFrame={setFrame} p5sketch={p5sketch} set_mode={set_mode} settings={settings} setSettings={setSettings} getNumFrames={get_num_frames} playing={playing} setPlaying={setPlaying} setFps={setFps} undos={undos} updateUndo={updateUndo} undo={undo} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush} pselect={pselect} setAddBrush={setAddBrush}></Canvas>
         <Timeline layers={layers} setLayers={setLayers} layerCursor={layerCursor} setLayerCursor={setLayerCursor} frame={frame} setFrame={setFrame} fps={fps} setFps={setFps} playing={playing} setPlaying={setPlaying} getNumFrames={get_num_frames} p5sketch={p5sketch}></Timeline>
       </div>
-      <Details mode={mode} setMode={set_mode} layers={layers} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush}></Details>
+      <Details mode={mode} setMode={set_mode} layers={layers} fps={fps} getNumFrames={get_num_frames} p5sketch={p5sketch} settings={settings!} setSettings={setSettings} customBrushes={customBrushes} setCustomBrushes={setCustomBrushes} currentBrush={currentBrush} setCurrentBrush={setCurrentBrush} addBrush={addBrush}></Details>
     </div>
   );
 }

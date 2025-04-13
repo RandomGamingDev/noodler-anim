@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, pselect, setAddBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, pselect: boolean, setAddBrush: Dispatch<() => void> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -154,6 +154,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
       }
       */
 
+      let bounds = new Array(4);
       sketch.keyPressed = (event: KeyboardEvent) => {
         switch (event.code) {
           case "KeyB":
@@ -184,10 +185,23 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               break;
             undo();
             break;
+          case "Backspace":
+            write_buf.begin();
+            sketch.translate(-sketch.width / 2, -sketch.height / 2);
+            sketch.push();
+            sketch.erase();
+            {
+              sketch.noStroke();
+              sketch.rect(bounds[0], bounds[1], bounds[2], bounds[3]);
+            }
+            sketch.noErase();
+            sketch.pop();
+            write_buf.end();
+            break;
         }
       }
 
-      let local_clipboard: p5.Image;
+      let local_clipboard: p5.Image | null;
       sketch.draw = () => {
         cursor_handler();
 
@@ -227,7 +241,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               sketch.pop();
             }
             else if (mouse_was_pressed) {
-              const bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX, sketch.mouseY];
+              bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX, sketch.mouseY];
               if (bounds[0] > bounds[2]) {
                 const temp = bounds[0];
                 bounds[0] = bounds[2];
@@ -251,37 +265,23 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
               if (bounds[2] == 0 || bounds[3] == 0)
                 break;
 
-              if (mouse_pressed_event?.button == 2) {
-                write_buf.begin();
-                sketch.translate(-sketch.width / 2, -sketch.height / 2);
-                sketch.push();
-                {
-                  sketch.noStroke();
-                  sketch.fill(255, 255, 255);
-                  sketch.rect(bounds[0], bounds[1], bounds[2], bounds[3]);
+              const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
+              const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
+
+              local_clipboard = copied_img;
+
+              copied.toBlob(function(blob) { 
+                const item = new ClipboardItem({ "image/png": blob! });
+                navigator.clipboard.write([item]); 
+
+                const reader = new FileReader();
+                reader.onload = function() {
+                  setCurrentBrush(prevCurrentBrush => currentBrush == -1 ? 0 : prevCurrentBrush);
+                  setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
                 }
-                sketch.pop();
-                write_buf.end();
-              }
-              else {
-                const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
-                const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
-
-                local_clipboard = copied_img;
-
-                copied.toBlob(function(blob) { 
-                  const item = new ClipboardItem({ "image/png": blob! });
-                  navigator.clipboard.write([item]); 
-
-                  const reader = new FileReader();
-                  reader.onload = function() {
-                    setCurrentBrush(prevCurrentBrush => currentBrush == -1 ? 0 : prevCurrentBrush);
-                    setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
-                  }
-                  if (blob != null)
-                    reader.readAsDataURL(blob!);
-                });
-              }
+                if (blob != null)
+                  reader.readAsDataURL(blob!);
+              });
             }
             break;
           case DrawMode.Brush:
@@ -320,12 +320,95 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             sketch.pop();
             break;
           case DrawMode.PixelBrush:
-            if (local_clipboard == undefined || currentBrushRef.current! == -1)
+            if (pselect) {
+              if (sketch.mouseIsPressed) {
+                sketch.push();
+                {
+                  sketch.noFill();
+                  sketch.stroke(200);
+                  sketch.strokeWeight(3);
+                  const selection_org = [mouse_pressed_loc[0], mouse_pressed_loc[1]]
+                  sketch.rect(
+                    mouse_pressed_loc[0],
+                    mouse_pressed_loc[1],
+                    sketch.mouseX - selection_org[0],
+                    sketch.mouseY - selection_org[1]
+                  );
+                }
+                sketch.pop();
+              }
+              else if (mouse_was_pressed) {
+                const bounds = [mouse_pressed_loc[0], mouse_pressed_loc[1], sketch.mouseX, sketch.mouseY];
+                if (bounds[0] > bounds[2]) {
+                  const temp = bounds[0];
+                  bounds[0] = bounds[2];
+                  bounds[2] = temp;
+                }
+                if (bounds[1] > bounds[3]) {
+                  const temp = bounds[1];
+                  bounds[1] = bounds[3];
+                  bounds[3] = temp;
+                }
+                {
+                  bounds[0] = Math.max(Math.min(bounds[0], sketch.width), 0);
+                  bounds[2] = Math.max(Math.min(bounds[2], sketch.width), 0);
+                  bounds[1] = Math.max(Math.min(bounds[1], sketch.height), 0);
+                  bounds[3] = Math.max(Math.min(bounds[3], sketch.height), 0);
+                }
+                {
+                  bounds[2] -= bounds[0];
+                  bounds[3] -= bounds[1];
+                }
+                if (bounds[2] == 0 || bounds[3] == 0)
+                  break;
+
+                if (mouse_pressed_event?.button == 2) {
+                  write_buf.begin();
+                  sketch.translate(-sketch.width / 2, -sketch.height / 2);
+                  sketch.push();
+                  {
+                    sketch.noStroke();
+                    sketch.fill(255, 255, 255);
+                    sketch.rect(bounds[0], bounds[1], bounds[2], bounds[3]);
+                  }
+                  sketch.pop();
+                  write_buf.end();
+                }
+                else {
+                  const copied_img = sketch.get(bounds[0], bounds[1], bounds[2], bounds[3]);
+                  const copied: HTMLCanvasElement = (copied_img as unknown as { canvas: HTMLCanvasElement }).canvas;
+
+                  local_clipboard = copied_img;
+
+                  setAddBrush(() => () => {
+                    copied.toBlob(function(blob) { 
+                      const item = new ClipboardItem({ "image/png": blob! });
+                      navigator.clipboard.write([item]); 
+
+                      const reader = new FileReader();
+                      reader.onload = function() {
+                        setCurrentBrush(prevCurrentBrush => currentBrush == -1 ? 0 : prevCurrentBrush);
+                        setCustomBrushes(prevCustomBrushes => [[copied_img, reader.result! as string], ...prevCustomBrushes]);
+                      }
+                      if (blob != null)
+                        reader.readAsDataURL(blob!);
+                      local_clipboard = null;
+                    });
+                  });
+                }
+                pselect = false;
+              }
+              break;
+            }
+            if (local_clipboard == null && currentBrushRef.current! == -1)
               break;
             sketch.push();
             {
               // Draw cursor
-              sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
+              if (local_clipboard != null)
+                sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+              else
+                sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
 
               // Draw
               if (sketch.mouseIsPressed) {
@@ -333,7 +416,10 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                   write_buf.begin();
                   sketch.translate(-sketch.width / 2, -sketch.height / 2);
                   {
-                    sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
+                    if (local_clipboard != null)
+                      sketch.image(local_clipboard, sketch.mouseX - local_clipboard.width / 2, sketch.mouseY - local_clipboard.height / 2, local_clipboard.width * settingsRef.current!.pixelbrush_size, local_clipboard.height * settingsRef.current!.pixelbrush_size);
+                    else
+                      sketch.image(customBrushesRef.current![currentBrushRef.current!][0], sketch.mouseX - customBrushesRef.current![currentBrushRef.current!][0].width / 2, sketch.mouseY - customBrushesRef.current![currentBrushRef.current!][0].height / 2, customBrushesRef.current![currentBrushRef.current!][0].width * settingsRef.current!.pixelbrush_size, customBrushesRef.current![currentBrushRef.current!][0].height * settingsRef.current!.pixelbrush_size);
                   }
                   write_buf.end();
                 }

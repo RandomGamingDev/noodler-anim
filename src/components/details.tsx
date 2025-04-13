@@ -5,7 +5,7 @@ import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>> }) {
+export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, addBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, addBrush: () => undefined }) {
   const create = () => {
     setMode(DrawMode.Information);
     create_project();
@@ -23,10 +23,7 @@ export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sk
     </div>
   );
 
-  const addBrush = () => {
-    setMode(DrawMode.Select);
-  }
-  const brush_details = (
+  const general_details = (
     <div className="text-left">
       <table>
         <thead></thead>
@@ -222,12 +219,12 @@ export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sk
       {
         [
           create_details,
-          brush_details,
-          brush_details,
-          brush_details,
-          brush_details,
-          brush_details,
-          brush_details,
+          general_details,
+          general_details,
+          general_details,
+          general_details,
+          general_details,
+          general_details,
           download_details,
           export_details,
           information_details
