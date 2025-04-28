@@ -107,7 +107,7 @@ export default function Timeline({ layers, setLayers, layerCursor, setLayerCurso
       <div className="overflow-scroll h-[85%]">
         {
           layers.map((e, i) => (
-            <div className="max-w-full flex border border-gray-700 py-1" id={`layers-row-${i}`} key={`layers-row-${i}`}>
+            <div className={`max-w-full flex border ${i == layerCursor ? "border-gray-500" : "border-gray-700"} py-1`} id={`layers-row-${i}`} key={`layers-row-${i}`}>
               <div className="flex w-32 max-w-32 overflow-x-scroll">
                 {
                   e.visible ? 

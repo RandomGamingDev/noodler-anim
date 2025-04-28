@@ -5,7 +5,7 @@ import { CanvasCapture } from 'canvas-capture';
 import DraggableInput from "./draggable-input";
 import { create_project, input_x_res, input_y_res } from "./canvas";
 
-export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, addBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, addBrush: () => undefined }) {
+export default function Details({ mode, setMode, layers, fps, getNumFrames, p5sketch, settings, setSettings, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, addBrush } : { mode: DrawMode, setMode: Dispatch<DrawMode>, layers: Array<Layer>, fps: number, getNumFrames: () => number, p5sketch: RefObject<p5 | null>, settings: Settings, setSettings: Dispatch<Settings>, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, addBrush: () => void }) {
   const create = () => {
     setMode(DrawMode.Information);
     create_project();

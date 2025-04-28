@@ -9,7 +9,7 @@ export let input_x_res: RefObject<HTMLInputElement | null>;
 export let input_y_res: RefObject<HTMLInputElement | null>;
 export let create_project: () => void;
 
-export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, pselect, setAddBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, pselect: boolean, setAddBrush: Dispatch<() => void> }) {
+export default function Canvas({ mode, layers, setLayers, layerCursor, frame, setFrame, p5sketch, set_mode, settings, setSettings, getNumFrames, playing, setPlaying, setFps, undos, updateUndo, undo, customBrushes, setCustomBrushes, currentBrush, setCurrentBrush, pselect, setPSelect, setAddBrush } : { mode: DrawMode, layers: Array<Layer>, setLayers: Dispatch<SetStateAction<Array<Layer>>>, layerCursor: number, frame: number, setFrame: Dispatch<number>, p5sketch: RefObject<p5 | null>, set_mode: (mode: DrawMode) => void, settings: Settings, setSettings: Dispatch<Settings>, getNumFrames: () => number, playing: boolean, setPlaying: Dispatch<boolean>, setFps: Dispatch<number>, undos: BackupFramebuffer[], updateUndo: (sketch: p5) => void, undo: () => void, customBrushes: [p5.Image, string][], setCustomBrushes: Dispatch<SetStateAction<[p5.Image, string][]>>, currentBrush: number, setCurrentBrush: Dispatch<SetStateAction<number>>, pselect: boolean, setPSelect: Dispatch<boolean>, setAddBrush: Dispatch<() => void> }) {
   const canvas_container: RefObject<HTMLDivElement | null> = useRef(null);
 
   const modeRef = useRef(mode);
@@ -21,6 +21,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
   const undosRef = useRef(undos);
   const customBrushesRef = useRef(customBrushes);
   const currentBrushRef = useRef(currentBrush);
+  const pselectRef = useRef(pselect);
   useEffect(() => {
     modeRef.current = mode;
     layersRef.current = layers;
@@ -31,6 +32,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
     undosRef.current = undos;
     customBrushesRef.current = customBrushes;
     currentBrushRef.current = currentBrush;
+    pselectRef.current = pselect;
   });
 
   input_x_res = useRef(null);
@@ -320,7 +322,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
             sketch.pop();
             break;
           case DrawMode.PixelBrush:
-            if (pselect) {
+            if (pselectRef.current!) {
               if (sketch.mouseIsPressed) {
                 sketch.push();
                 {
@@ -396,7 +398,7 @@ export default function Canvas({ mode, layers, setLayers, layerCursor, frame, se
                     });
                   });
                 }
-                pselect = false;
+                setPSelect(false);
               }
               break;
             }
